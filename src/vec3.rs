@@ -82,8 +82,8 @@ impl DivAssign<f64> for Vec3 {
 }
 
 // Type aliases
-type Point3 = Vec3;
-type Color = Vec3;
+pub type Point3 = Vec3;
+pub type Color = Vec3;
 
 // Utlity functions!
 impl Add for Vec3 {
