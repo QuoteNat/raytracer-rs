@@ -1,5 +1,6 @@
 use std::io;
 use std::io::Write;
+mod vec3;
 
 fn main() {
     // Image
