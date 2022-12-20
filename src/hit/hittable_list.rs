@@ -1,5 +1,5 @@
-use crate::hittable::*;
-use crate::Ray;
+use super::super::Ray;
+use super::hittable::*;
 
 pub struct HittableList<'a> {
     pub objects: Vec<&'a dyn Hittable>,

@@ -6,10 +6,8 @@ mod ray;
 use ray::*;
 mod shapes;
 use shapes::*;
-mod hittable_list;
-use hittable_list::*;
-mod hittable;
-use hittable::*;
+mod hit;
+use hit::*;
 mod rtweekend;
 use rtweekend::*;
 
