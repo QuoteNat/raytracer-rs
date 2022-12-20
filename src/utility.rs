@@ -21,3 +21,9 @@ pub fn random_float_1() -> f64 {
     let mut rng = thread_rng();
     return rng.gen_range(0.0..1.0)
 }
+
+pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
+    if x < min {return min}
+    if x > max {return max}
+    return x;
+}
