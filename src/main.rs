@@ -11,7 +11,7 @@ use hit::*;
 mod utility;
 use utility::*;
 mod camera;
-use crate::camera::CameraCreator;
+use crate::camera::camera_creator;
 
 
 /// Return ray color
@@ -48,7 +48,7 @@ fn main() {
     });
 
     // Camera
-    let cam = CameraCreator();
+    let cam = camera_creator();
 
     // Render
     println!("P3\n{} {}\n255\n", image_width, image_height);

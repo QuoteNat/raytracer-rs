@@ -19,7 +19,7 @@ impl Camera {
 }
 
 /// Creates a new camera struct
-pub fn CameraCreator() -> Camera {
+pub fn camera_creator() -> Camera {
     let aspect_ratio = 16.0 / 9.0;
     let viewport_height = 2.0;
     let viewport_width = aspect_ratio * viewport_height;
