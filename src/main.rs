@@ -57,7 +57,7 @@ fn main() {
     // Render
     println!("P3\n{} {}\n255\n", image_width, image_height);
 
-    for j in (0..image_height-1).rev() {
+    for j in (-1..image_height).rev() {
         eprint!("\rScanlines remaining: {} ", j);
         io::stderr().flush().unwrap();
 
