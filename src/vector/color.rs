@@ -1,4 +1,4 @@
-use crate::vec3::Color;
+use super::vec3::Color;
 
 pub fn write_color(pixel_color: Color) {
     print!("{} {} {}\n", (pixel_color.x()* 255.99) as i32, 

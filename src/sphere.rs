@@ -1,4 +1,4 @@
-use crate::vec3::*;
+use crate::vector::vec3::*;
 use crate::hittable::*;
 use crate::Ray;
 

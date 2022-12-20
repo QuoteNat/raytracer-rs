@@ -1,9 +1,8 @@
 use std::io;
 use std::io::Write;
-mod vec3;
-use vec3::*;
-mod color;
-use color::*;
+mod vector;
+use vector::vec3::*;
+use vector::color::*;
 mod ray;
 use ray::*;
 mod sphere;
