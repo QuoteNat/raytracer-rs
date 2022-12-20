@@ -1,12 +1,11 @@
 use std::io;
 use std::io::Write;
 mod vector;
-use vector::vec3::*;
-use vector::color::*;
+use vector::*;
 mod ray;
 use ray::*;
 mod shapes;
-use shapes::sphere::*;
+use shapes::*;
 mod hittable_list;
 use hittable_list::*;
 mod hittable;
