@@ -3,7 +3,7 @@ use std::io::Write;
 mod vector;
 use vector::*;
 mod ray;
-use ray::*;
+use ray::Ray;
 mod shapes;
 use shapes::*;
 mod hit;
