@@ -6,17 +6,27 @@ mod color;
 use color::*;
 mod ray;
 use ray::*;
+mod sphere;
+use sphere::*;
+mod hittable_list;
+use hittable_list::*;
+mod hittable;
+use hittable::*;
+mod rtweekend;
+use rtweekend::*;
+
 
 /// Return ray color
-fn ray_color(r: &Ray) -> Color {
-    let t = hit_sphere(&Point3{e:[0.0, 0.0, -1.0]}, 0.5, r);
-    if t > 0.0 {
-        let N = unit_vector(r.at(t) - Vec3{e:[0.0, 0.0, -1.0]});
-        return 0.5 * Color{e:[N.x() + 1.0, N.y() + 1.0, N.z() + 1.0]};
+fn ray_color(r: &Ray, world: &dyn Hittable) -> Color {
+    let mut rec = HitRecord { p: Point3{e:[0.0,0.0,0.0]}, normal: Point3{e:[0.0,0.0,0.0]}, t: INFINITY };
+
+    if world.hit(r, 0.0, INFINITY, &mut rec) {
+        return 0.5 * (Color{e:[1.0, 1.0, 1.0]} + rec.normal);
     }
+
     let unit_direction = unit_vector(r.direction);
-    let t = 0.5*(unit_direction.y() + 1.0);
-    (1.0-t) * Color{e:[1.0, 1.0, 1.0]} + t * Color{e:[0.5, 0.7, 1.0]}
+    let t = 0.5 * (unit_direction.y() + 1.0);
+    return (1.0 - t) * Color{e:[1.0, 1.0, 1.0]} + t * Color{e:[0.5, 0.7, 1.0]};
 }
 
 fn main() {
@@ -24,6 +34,19 @@ fn main() {
     let aspect_ratio = 16.0/9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
+
+    // World
+    let mut world = HittableList {
+        objects: Vec::new(),
+    };
+    world.add(&Sphere {
+        center: Point3{e:[0.0, 0.0, -1.0]},
+        radius: 0.5,
+    });
+    world.add(&Sphere {
+        center: Point3{e:[0.0, -100.5, -1.0]},
+        radius: 100.0,
+    });
 
     // Camera
     let viewport_height = 2.0;
@@ -49,11 +72,11 @@ fn main() {
                 origin: origin,
                 direction: lower_left_corner + u*horizontal + v*vertical - origin
             };
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
             write_color(pixel_color);
         }
     }
 
     // Make it so progress indicator doesn't end up before terminal prompt
-    eprintln!()
+    eprintln!("\nDone")
 }

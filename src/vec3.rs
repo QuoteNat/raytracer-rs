@@ -152,6 +152,7 @@ pub fn dot(u: &Vec3, v: &Vec3) -> f64{
 }
 
 /// Cross product of two vectors
+#[allow(dead_code)]
 pub fn cross(u: &Vec3, v: &Vec3) -> Vec3 {
     Vec3 {
         e: [u.e[1] * v.e[2] - u.e[2] * v.e[1],
