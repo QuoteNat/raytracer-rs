@@ -8,8 +8,8 @@ mod shapes;
 use shapes::*;
 mod hit;
 use hit::*;
-mod rtweekend;
-use rtweekend::*;
+mod utility;
+use utility::*;
 
 
 /// Return ray color
