@@ -27,3 +27,8 @@ pub fn random_in_unit_sphere() -> Vec3 {
 pub fn random_unit_vector() -> Vec3 {
     unit_vector(random_in_unit_sphere())
 }
+
+/// Reflect a vector around an normal
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    *v - *n * dot(v,n) * 2.0
+}

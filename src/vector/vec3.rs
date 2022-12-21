@@ -32,6 +32,16 @@ impl Vec3 {
         self.length_squared().sqrt()
     }
 
+    /// Returns true if all vector dimensions are less than 1e-8
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.e[0].abs() < s && self.e[1].abs() < s && self.e[2].abs() < s
+    }
+
+    pub fn err_write(&self) {
+        eprintln!("({}, {}, {})", self.e[0], self.e[1], self.e[2]);
+    }
+
 }
 
 /// Negation. Equivalent to -1 * vector
