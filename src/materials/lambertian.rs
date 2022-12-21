@@ -19,10 +19,10 @@ impl Material for Lambertian {
 
         let scattered = Rc::new(Ray {origin: rec.p, direction: scatter_direction});
         let attenuation = Rc::new(self.albedo);
-        let scatterStr = ScatterStruct {
+        let scatter_str = ScatterStruct {
             attenuation,
             scattered,
         };
-        return Some(scatterStr);
+        return Some(scatter_str);
     }
 }

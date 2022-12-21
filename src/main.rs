@@ -27,7 +27,7 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 
     // Recursion limit
     if depth <= 0 {
-        return Color{e:[1.0, 1.0, 1.0]};
+        return zero_vec();
     }
 
     match world.hit(r, 0.001, INFINITY) {
@@ -62,8 +62,8 @@ fn main() {
     
     let material_ground: Rc<dyn Material> = Rc::new(Lambertian{albedo: quick_vec(0.8, 0.8, 0.0)});
     let material_center: Rc<dyn Material>  = Rc::new(Lambertian{albedo: quick_vec(0.7, 0.3, 0.3)});
-    let material_left: Rc<dyn Material>  = Rc::new(Metal{albedo: quick_vec(0.8, 0.8, 0.8)});
-    let material_right: Rc<dyn Material>  = Rc::new(Metal{albedo: quick_vec(0.8, 0.6, 0.2)});
+    let material_left: Rc<dyn Material>  = Rc::new(Metal{albedo: quick_vec(0.8, 0.8, 0.8), fuzz: 0.3});
+    let material_right: Rc<dyn Material>  = Rc::new(Metal{albedo: quick_vec(0.8, 0.6, 0.2), fuzz: 1.0});
 
     let sphere_ground: Rc<dyn Hittable> = Rc::new(Sphere {
         center: quick_vec(0.0, -100.5, -1.0),
@@ -97,7 +97,7 @@ fn main() {
     // Render
     println!("P3\n{} {}\n255\n", image_width, image_height);
 
-    for j in (0..image_height-1).rev() {
+    for j in (0..image_height).rev() {
         eprint!("\rScanlines remaining: {} ", j);
         io::stderr().flush().unwrap();
 
