@@ -11,6 +11,7 @@ use hit::*;
 mod utility;
 use utility::*;
 mod camera;
+mod materials;
 use crate::camera::camera_creator;
 
 

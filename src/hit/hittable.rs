@@ -1,15 +1,16 @@
 use crate::vector::vec3::*;
-use crate::Ray;
+use super::*;
 
 /// Hit record class
 #[derive(Copy, Clone)]
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub p: Point3,
     pub normal: Vec3,
+    pub material: &'a dyn Material,
     pub t: f64,
 }
 
-impl HitRecord {
+impl HitRecord<'_> {
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
         let front_face = dot(&r.direction, outward_normal) < 0.0;
         if front_face {

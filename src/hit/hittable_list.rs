@@ -1,5 +1,4 @@
-use super::super::Ray;
-use super::hittable::*;
+use super::*;
 
 pub struct HittableList<'a> {
     pub objects: Vec<&'a dyn Hittable>,

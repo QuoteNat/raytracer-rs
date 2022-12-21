@@ -1,13 +1,12 @@
-use crate::vector::vec3::*;
-use crate::hit::*;
-use crate::Ray;
+use super::*;
 
-pub struct Sphere {
+pub struct Sphere<'a> {
     pub center: Point3,
     pub radius: f64,
+    pub material: &'a dyn Material,
 }
 
-impl Hittable for Sphere {
+impl Hittable for Sphere<'_> {
     /// Ray intersect function for spheres
     /// Returns true if there is an intersection in range [t_min, t_max]
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
