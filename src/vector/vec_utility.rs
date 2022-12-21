@@ -32,3 +32,11 @@ pub fn random_unit_vector() -> Vec3 {
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
     *v - *n * dot(v,n) * 2.0
 }
+
+pub fn zero_vec() -> Vec3 {
+    Vec3 {e: [0.0, 0.0, 0.0]}
+}
+
+pub fn quick_vec(x: f64, y: f64, z: f64) -> Vec3 {
+    Vec3 {e: [x, y, z]}
+}
