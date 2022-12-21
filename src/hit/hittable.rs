@@ -2,15 +2,14 @@ use crate::vector::vec3::*;
 use super::*;
 
 /// Hit record class
-#[derive(Copy, Clone)]
-pub struct HitRecord<'a> {
+pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub material: &'a dyn Material,
+    pub material: Rc<dyn Material>,
     pub t: f64,
 }
 
-impl HitRecord<'_> {
+impl HitRecord {
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
         let front_face = dot(&r.direction, outward_normal) < 0.0;
         if front_face {
@@ -24,5 +23,5 @@ impl HitRecord<'_> {
 /// An object that can be intersected by a ray
 pub trait Hittable {
     /// Implements ray intersect function for a given object
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }

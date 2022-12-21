@@ -1,31 +1,48 @@
+use crate::{vector::vec_utility::zero_vec, materials::lambertian::Lambertian};
+
 use super::*;
 
-pub struct HittableList<'a> {
-    pub objects: Vec<&'a dyn Hittable>,
+pub struct HittableList {
+    pub objects: Vec<Rc<dyn Hittable>>,
 }
 
-impl<'a> HittableList<'a> {
+impl HittableList {
     /// Add a Hittable object to the HittableList
-    pub fn add(&mut self, object: &'a dyn Hittable) {
+    pub fn add(&mut self, object: Rc<dyn Hittable>) {
         self.objects.push(object);
     }
 }
 
-impl Hittable for HittableList<'_> {
+impl Hittable for HittableList {
     /// Check for a ray intersection with every object in the hittable list
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        let mut temp_rec = *rec;
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let mut temp_rec = HitRecord {
+            p: zero_vec(),
+            normal: zero_vec(),
+            material: Rc::new(Lambertian {albedo: zero_vec()}),
+            t: t_max,
+        };
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
         for object in &self.objects {
-            if object.hit(r, t_min, closest_so_far, &mut temp_rec) {
-                hit_anything = true;
-                closest_so_far = temp_rec.t;
-                *rec = temp_rec;
+            match object.hit(r, t_min, closest_so_far) {
+                Some(rec) => {
+                    hit_anything = true;
+                    closest_so_far = rec.t;
+                    temp_rec.material = Rc::clone(&rec.material);
+                    temp_rec.t = rec.t;
+                    temp_rec.normal = rec.normal;
+                    temp_rec.p = rec.p;
+                }, 
+                None => {},
             }
         }
 
-        return hit_anything;
+        if hit_anything {
+            return Some(temp_rec)
+        } else {
+            return None
+        }
     }
 }
