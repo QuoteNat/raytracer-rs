@@ -7,6 +7,10 @@ pub use lambertian::Lambertian;
 pub mod metal;
 pub use metal::Metal;
 
+pub struct ScatterStruct {
+    pub attenuation: Rc<Color>,
+    pub scattered: Rc<Ray>,
+}
 pub trait Material {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord, attenuation: &mut Color, scattered: &mut Ray) -> bool;
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct>;
 }

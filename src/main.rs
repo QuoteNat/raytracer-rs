@@ -32,7 +32,12 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 
     match world.hit(r, 0.001, INFINITY) {
         Some(rec) => {
-            let
+            match rec.material.scatter(r, &rec) {
+                Some(scatter) => {
+                    return *scatter.attenuation * ray_color(&scatter.scattered, world, depth-1);
+                },
+                None => {}
+            }
         },
         None => {}
     }
@@ -47,8 +52,8 @@ fn main() {
     let aspect_ratio = 16.0/9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 10;
-    let max_depth = 5;
+    let samples_per_pixel = 100;
+    let max_depth = 50;
 
     // World
     let mut world = HittableList {
