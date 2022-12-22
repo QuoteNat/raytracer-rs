@@ -53,7 +53,7 @@ fn main() {
     let aspect_ratio = 16.0/9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 50;
+    let samples_per_pixel = 10;
     let max_depth = 50;
 
     // World
@@ -81,11 +81,11 @@ fn main() {
         radius: 0.5,
         material: Rc::clone(&material_left),
     });
-    // let sphere_bubble: Rc<dyn Hittable> = Rc::new(Sphere {
-    //     center: quick_vec(-1.0, 0.0, -1.0),
-    //     radius: -0.4,
-    //     material: Rc::clone(&material_left)
-    // });
+    let sphere_bubble: Rc<dyn Hittable> = Rc::new(Sphere {
+        center: quick_vec(-1.0, 0.0, -1.0),
+        radius: -0.4,
+        material: Rc::clone(&material_left)
+    });
     let sphere_right: Rc<dyn Hittable> = Rc::new(Sphere {
         center: quick_vec(1.0, 0.0, -1.0),
         radius: 0.5,
@@ -95,7 +95,7 @@ fn main() {
     world.add(Rc::clone(&sphere_ground));
     world.add(Rc::clone(&sphere_center));
     world.add(Rc::clone(&sphere_left));
-    // world.add(Rc::clone(&sphere_bubble));
+    world.add(Rc::clone(&sphere_bubble));
     world.add(Rc::clone(&sphere_right));
 
     // Camera

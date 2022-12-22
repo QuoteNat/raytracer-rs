@@ -18,7 +18,6 @@ impl Material for Dielectric {
         if rec.front_face {
             refraction_ratio = 1.0 / self.ir;
         } else {
-            eprintln!("Exited sphere");
             refraction_ratio = self.ir;
         };
 
