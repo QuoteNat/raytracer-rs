@@ -52,9 +52,9 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 fn main() {
     // Image
     let aspect_ratio = 16.0/9.0;
-    let image_width = 400;
+    let image_width = 1920;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 10;
+    let samples_per_pixel = 1000;
     let max_depth = 50;
 
     // World
@@ -62,10 +62,15 @@ fn main() {
         objects: Vec::new(),
     };
     
-    let world = scenes::red_blue::make_red_blue();
+    let world = scenes::bubble::make_bubble();
 
     // Camera
-    let cam = camera_creator(90.0, aspect_ratio);
+    let cam = camera_creator(
+        quick_vec(-2.0, 2.0, 1.0), 
+        quick_vec(0.0, 0.0, -1.0), 
+        quick_vec(0.0, 1.0, 0.0), 
+        20.0, 
+        aspect_ratio);
 
     // Render
     println!("P3\n{} {}\n255\n", image_width, image_height);
