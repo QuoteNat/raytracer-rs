@@ -99,7 +99,7 @@ fn main() {
     world.add(Rc::clone(&sphere_right));
 
     // Camera
-    let cam = camera_creator();
+    let cam = camera_creator(90.0, aspect_ratio);
 
     // Render
     println!("P3\n{} {}\n255\n", image_width, image_height);

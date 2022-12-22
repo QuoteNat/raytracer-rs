@@ -1,3 +1,4 @@
+use crate::utility::degrees_to_radians;
 use crate::vector::*;
 use crate::ray::Ray;
 
@@ -19,9 +20,12 @@ impl Camera {
 }
 
 /// Creates a new camera struct
-pub fn camera_creator() -> Camera {
-    let aspect_ratio = 16.0 / 9.0;
-    let viewport_height = 2.0;
+/// vfov: Vertical field of view in degrees
+/// aspect_ratio: aspect ratio of the image
+pub fn camera_creator(vfov: f64, aspect_ratio: f64) -> Camera {
+    let theta = degrees_to_radians(vfov);
+    let h = f64::tan(theta / 2.0);
+    let viewport_height = 2.0 * h;
     let viewport_width = aspect_ratio * viewport_height;
     let focal_length = 1.0;
 
