@@ -43,8 +43,11 @@ pub fn quick_vec(x: f64, y: f64, z: f64) -> Vec3 {
 
 /// Ray refraction using Snell's law
 pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
-    let cos_theta = f64::min(dot(&(-(*uv)), n), 1.0);
-    let r_out_perp = etai_over_etat * (*uv + cos_theta * (*n));
-    let r_out_parallel = -1.0 * f64::sqrt(f64::abs(1.0 - r_out_perp.length_squared())) * (*n);
+    let uv = *uv;
+    let n = *n;
+    let cos_theta = f64::min(dot(&(-uv), &n), 1.0);
+    let r_out_perp = etai_over_etat * (uv + cos_theta * n);
+    let r_out_parallel = -f64::sqrt(f64::abs(1.0 - r_out_perp.length_squared())) * n;
+
     r_out_perp + r_out_parallel
 }

@@ -11,7 +11,7 @@ pub struct Dielectric {
 impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct> {
         let attenuation = Rc::new(quick_vec(1.0, 1.0, 1.0));
-        let mut refraction_ratio = 0.0;
+        let refraction_ratio;
         if rec.front_face {
             refraction_ratio = 1.0 / self.ir;
         } else {
