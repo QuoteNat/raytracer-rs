@@ -35,6 +35,7 @@ impl Hittable for HittableList {
                     temp_rec.t = rec.t;
                     temp_rec.normal = rec.normal;
                     temp_rec.p = rec.p;
+                    temp_rec.front_face = rec.front_face;
                 }, 
                 None => {},
             }
