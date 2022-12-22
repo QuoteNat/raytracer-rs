@@ -62,7 +62,7 @@ fn main() {
         objects: Vec::new(),
     };
     
-    let world = scenes::bubble::make_bubble();
+    let world = scenes::red_blue::make_red_blue();
 
     // Camera
     let cam = camera_creator(90.0, aspect_ratio);
