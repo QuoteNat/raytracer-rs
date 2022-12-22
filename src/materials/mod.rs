@@ -6,6 +6,7 @@ pub mod lambertian;
 pub use lambertian::Lambertian;
 pub mod metal;
 pub use metal::Metal;
+pub mod dielectrics;
 
 pub struct ScatterStruct {
     pub attenuation: Rc<Color>,

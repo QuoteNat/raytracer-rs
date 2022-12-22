@@ -46,10 +46,10 @@ impl Vec3 {
 
 /// Negation. Equivalent to -1 * vector
 impl Neg for Vec3 {
-    type Output = [f64; 3];
+    type Output = Vec3;
 
     fn neg(self) -> Self::Output {
-        return [-self.e[0], -self.e[1], -self.e[2]]
+        return Vec3{e:[-self.e[0], -self.e[1], -self.e[2]]}
     }
 }
 

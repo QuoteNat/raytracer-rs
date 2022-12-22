@@ -21,6 +21,7 @@ impl Hittable for HittableList {
             normal: zero_vec(),
             material: Rc::new(Lambertian {albedo: zero_vec()}),
             t: t_max,
+            front_face: true,
         };
         let mut hit_anything = false;
         let mut closest_so_far = t_max;

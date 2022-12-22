@@ -41,7 +41,8 @@ impl Hittable for Sphere {
             t,
             p,
             normal,
-            material
+            material,
+            front_face: true
         };
 
         rec.set_face_normal(r, &normal);
