@@ -10,27 +10,38 @@ pub struct Dielectric {
 
 impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct> {
+        // Set attenuation to full for all
         let attenuation = Rc::new(quick_vec(1.0, 1.0, 1.0));
+
+        // Let refraction ratio equal 1/ir if outside the object, or ir if inside the object
         let refraction_ratio;
         if rec.front_face {
             refraction_ratio = 1.0 / self.ir;
         } else {
+            eprintln!("Exited sphere");
             refraction_ratio = self.ir;
         };
 
+        // Get the unit vector of the ray direction
         let unit_direction = unit_vector(r_in.direction);
+        // Get cos of the angle between -unit_direction and the normal vector (set to 1.0 if over 1.0 somehow)
         let cos_theta = f64::min(dot(&(-unit_direction), &rec.normal), 1.0);
+        // Get the sin of the angle
         let sin_theta = f64::sqrt(1.0 - cos_theta*cos_theta);
 
+        // If refraction_ratio * sin_theta is greater than 1, refraction is not possible
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
         let direction: Vec3;
-
+        // If refraction is not possible, or if reflectance is greater than a random f64 from 0 to 1
         if cannot_refract || reflectance(cos_theta, refraction_ratio) > random_float_1() {
+            // Reflect
             direction = reflect(&unit_direction, &rec.normal);
         } else {
+            // Refract (bug is probably here)
             direction = refract(&unit_direction, &rec.normal, refraction_ratio);
         }
 
+        // Return the scattered ray
         let scattered = Rc::new(Ray {
             origin: rec.p,
             direction,
