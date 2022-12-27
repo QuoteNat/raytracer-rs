@@ -32,7 +32,7 @@ pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
 
 pub fn random_in_unit_disk() -> Vec3 {
     loop {
-        let p = quick_vec(random_float(-1.0, 1.0), random_float(-1.0, 1.0), 0);
+        let p = quick_vec(random_float(-1.0, 1.0), random_float(-1.0, 1.0), 0.0);
         if p.length_squared() < 1.0 {
             return p;
         }
