@@ -1,6 +1,8 @@
 extern crate rand;
 use rand::thread_rng;
 use rand::Rng;
+use crate::vector::vec3::Vec3;
+use crate::vector::vec_utility::{quick_vec};
 
 /// Max value of f64
 pub const INFINITY: f64 = f64::INFINITY;
@@ -26,4 +28,13 @@ pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
     if x < min {return min}
     if x > max {return max}
     return x;
+}
+
+pub fn random_in_unit_disk() -> Vec3 {
+    loop {
+        let p = quick_vec(random_float(-1.0, 1.0), random_float(-1.0, 1.0), 0);
+        if p.length_squared() < 1.0 {
+            return p;
+        }
+    }
 }
