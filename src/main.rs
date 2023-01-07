@@ -1,7 +1,7 @@
 use std::io;
 use std::io::Write;
 mod vector;
-use vector::*;
+use vector::{Color, zero_vec, unit_vector, write_color};
 mod ray;
 use ray::Ray;
 mod shapes;
@@ -52,9 +52,9 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 fn main() {
     // Image
     let aspect_ratio = 16.0/9.0;
-    let image_width = 1200;
+    let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 50;
     let max_depth = 50;
 
     // World
@@ -62,7 +62,7 @@ fn main() {
         objects: Vec::new(),
     };
     
-    let world = scenes::random::random_scene();
+    let world = scenes::red_blue::make_red_blue();
 
     let cam = scenes::random::random_scene_camera(aspect_ratio);
 

@@ -1,5 +1,5 @@
-use crate::vector::vec_utility::{quick_vec, refract, reflect};
-use crate::random_float_1;
+use crate::vector::*;
+use crate::utility::{random_float_1};
 use super::*;
 
 /// Dielectric material

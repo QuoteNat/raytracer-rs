@@ -1,6 +1,6 @@
 use super::hit::*;
 use super::ray::Ray;
-use super::vec3::*;
+use super::vector::*;
 
 pub mod lambertian;
 pub use lambertian::Lambertian;

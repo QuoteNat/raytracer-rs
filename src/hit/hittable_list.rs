@@ -1,4 +1,4 @@
-use crate::{vector::vec_utility::zero_vec, materials::lambertian::Lambertian};
+use crate::{vector::*, materials::lambertian::Lambertian};
 
 use super::*;
 

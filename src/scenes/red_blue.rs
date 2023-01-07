@@ -1,7 +1,7 @@
 use crate::hit::*;
 use crate::materials::*;
-use crate::quick_vec;
 use crate::Sphere;
+use crate::vector::quick_vec;
 use crate::utility::*;
 
 pub fn make_red_blue() -> HittableList {

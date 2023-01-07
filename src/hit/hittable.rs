@@ -1,4 +1,4 @@
-use crate::vector::vec3::*;
+use crate::vector::*;
 use super::*;
 
 /// Hit record class

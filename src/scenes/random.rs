@@ -2,14 +2,11 @@ use crate::hit::*;
 use crate::materials::*;
 use crate::Dielectric;
 use crate::Metal;
-use crate::quick_vec;
+use crate::vector::{quick_vec, random_vec_1, random_vec};
 use crate::Sphere;
 use crate::camera::{camera_creator, Camera};
 use crate::utility::random_float;
 use crate::utility::random_float_1;
-use crate::vector::Color;
-use crate::vector::vec_utility::random_vec;
-use crate::vector::vec_utility::random_vec_1;
 
 
 pub fn random_scene() -> HittableList {

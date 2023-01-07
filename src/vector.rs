@@ -1,5 +1,5 @@
 use std::ops::{Neg, Index, IndexMut, AddAssign, MulAssign, DivAssign, Mul, Add, Div, Sub};
-
+use crate::utility::{random_float, clamp, random_float_1};
 /// A 3d vector struct
 #[derive(Copy, Clone)]
 pub struct Vec3 {
@@ -174,4 +174,73 @@ pub fn cross(u: &Vec3, v: &Vec3) -> Vec3 {
 /// Unit vector
 pub fn unit_vector(v: Vec3) -> Vec3 {
     v / v.length()
+}
+
+pub fn random_vec_1() -> Vec3 {
+    Vec3 {e:[random_float_1(),
+        random_float_1(),
+        random_float_1()
+        ]}
+}
+
+pub fn random_vec(min: f64, max: f64) -> Vec3 {
+    Vec3 {e:[random_float(min, max),
+        random_float(min, max),
+        random_float(min, max)
+        ]}
+}
+
+/// Return a random point in the unit sphere
+pub fn random_in_unit_sphere() -> Vec3 {
+    loop {
+        let p = random_vec(-1.0, 1.0);
+        if p.length_squared() < 1.0 {return p;}
+    }
+}
+
+/// Random unit vector
+pub fn random_unit_vector() -> Vec3 {
+    unit_vector(random_in_unit_sphere())
+}
+
+/// Reflect a vector around an normal
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    *v - *n * dot(v,n) * 2.0
+}
+
+pub fn zero_vec() -> Vec3 {
+    Vec3 {e: [0.0, 0.0, 0.0]}
+}
+
+pub fn quick_vec(x: f64, y: f64, z: f64) -> Vec3 {
+    Vec3 {e: [x, y, z]}
+}
+
+/// Ray refraction using Snell's law
+pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+    // dereference uv and n for math operations
+    let uv = *uv;
+    let n = *n;
+    // Get the angle between -uv and the normal
+    let cos_theta = f64::min(dot(&(-uv), &n), 1.0);
+    let r_out_perp = etai_over_etat * (uv + cos_theta * n);
+    let r_out_parallel = -f64::sqrt(f64::abs(1.0 - r_out_perp.length_squared())) * n;
+
+    r_out_perp + r_out_parallel
+}
+
+pub fn write_color(pixel_color: Color, samples_per_pixel: i32) {
+    let r = pixel_color.x();
+    let g = pixel_color.y();
+    let b = pixel_color.z();
+
+    // Divide the color by the number of samples
+    let scale = 1.0 / samples_per_pixel as f64;
+    let r = (r * scale).sqrt();
+    let g = (g * scale).sqrt();
+    let b = (b * scale).sqrt();
+    
+    print!("{} {} {}\n", (256.0 * clamp(r, 0.0, 0.999)) as i32, 
+        (256.0 * clamp(g, 0.0, 0.999)) as i32, 
+        (256.0 * clamp(b, 0.0, 0.999)) as i32);
 }

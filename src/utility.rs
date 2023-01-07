@@ -1,8 +1,7 @@
 extern crate rand;
 use rand::thread_rng;
 use rand::Rng;
-use crate::vector::vec3::Vec3;
-use crate::vector::vec_utility::{quick_vec};
+use crate::vector::{Vec3, quick_vec};
 
 /// Max value of f64
 pub const INFINITY: f64 = f64::INFINITY;

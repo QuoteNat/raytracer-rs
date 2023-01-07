@@ -1,7 +1,7 @@
 use crate::hit::*;
 use crate::materials::*;
 use crate::Dielectric;
-use crate::quick_vec;
+use crate::vector::{quick_vec};
 use crate::Sphere;
 
 pub fn make_bubble() -> HittableList {
