@@ -1,6 +1,7 @@
 use std::io;
 use std::io::Write;
 mod vector;
+mod shapes;
 use vector::{Color, zero_vec, unit_vector, write_color};
 mod ray;
 use ray::Ray;
@@ -12,7 +13,7 @@ mod camera;
 mod materials;
 use materials::*;
 mod scenes;
-use crate::materials::dielectrics::Dielectric;
+use crate::materials::Dielectric;
 
 
 /// Return ray color
@@ -59,9 +60,9 @@ fn main() {
         objects: Vec::new(),
     };
     
-    let world = scenes::red_blue::make_red_blue();
+    let world = scenes::make_red_blue();
 
-    let cam = scenes::random::random_scene_camera(aspect_ratio);
+    let cam = scenes::random_scene_camera(aspect_ratio);
 
     // Render
     println!("P3\n{} {}\n255\n", image_width, image_height);

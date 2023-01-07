@@ -1,6 +1,63 @@
-use crate::vector::*;
-use crate::utility::{random_float_1};
-use super::*;
+use crate::utility::random_float_1;
+
+use super::hit::*;
+use super::ray::Ray;
+use super::vector::*;
+
+pub struct ScatterStruct {
+    pub attenuation: Rc<Color>,
+    pub scattered: Rc<Ray>,
+}
+pub trait Material {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct>;
+}
+
+pub struct Metal {
+    pub albedo: Color,
+    pub fuzz: f64,
+}
+
+impl Material for Metal {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct> {
+        let reflected = reflect(&unit_vector(r_in.direction), &rec.normal);
+        let scattered = Rc::new(Ray{origin: rec.p, direction: reflected + self.fuzz*random_in_unit_sphere()});
+        let attenuation = Rc::new(self.albedo);
+        let scatter_str = ScatterStruct {
+            attenuation: Rc::clone(&attenuation),
+            scattered: Rc::clone(&scattered),
+        };
+
+        if dot(&scattered.direction, &rec.normal) > 0.0 {
+            return Some(scatter_str);
+        } else {
+            return None;
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct Lambertian {
+    pub albedo: Color,
+}
+
+impl Material for Lambertian {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct> {
+        let mut scatter_direction = rec.normal + random_unit_vector();
+
+        // Catch degenerate scatter direction
+        if scatter_direction.near_zero() {
+            scatter_direction = rec.normal;
+        }
+
+        let scattered = Rc::new(Ray {origin: rec.p, direction: scatter_direction});
+        let attenuation = Rc::new(self.albedo);
+        let scatter_str = ScatterStruct {
+            attenuation,
+            scattered,
+        };
+        return Some(scatter_str);
+    }
+}
 
 /// Dielectric material
 pub struct Dielectric {

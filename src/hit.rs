@@ -1,7 +1,7 @@
 use super::ray::Ray;
 use super::materials::Material;
 pub use std::rc::Rc;
-use crate::{vector::*, materials::lambertian::Lambertian};
+use crate::{vector::*, materials::Lambertian};
 
 /// Hit record class
 pub struct HitRecord {
