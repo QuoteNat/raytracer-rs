@@ -41,7 +41,8 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 
     let unit_direction = unit_vector(r.direction);
     let t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * Color { e: [1.0, 1.0, 1.0] } + t * Color { e: [0.5, 0.7, 1.0] };
+    // return (1.0 - t) * Color { e: [1.0, 1.0, 1.0] } + t * Color { e: [0.5, 0.7, 1.0] };
+    return zero_vec();
 }
 
 fn main() {
