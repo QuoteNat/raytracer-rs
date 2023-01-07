@@ -1,4 +1,7 @@
-use super::*;
+use crate::vector::*;
+use crate::hit::*;
+use crate::Ray;
+use crate::materials::Material;
 
 pub struct Sphere {
     pub center: Point3,

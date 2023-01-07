@@ -1,6 +1,6 @@
 use crate::hit::*;
 use crate::materials::*;
-use crate::Sphere;
+use crate::shapes::Sphere;
 use crate::vector::quick_vec;
 use crate::utility::*;
 

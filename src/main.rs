@@ -4,8 +4,6 @@ mod vector;
 use vector::{Color, zero_vec, unit_vector, write_color};
 mod ray;
 use ray::Ray;
-mod shapes;
-use shapes::*;
 mod hit;
 use hit::*;
 mod utility;
@@ -14,7 +12,6 @@ mod camera;
 mod materials;
 use materials::*;
 mod scenes;
-use crate::camera::camera_creator;
 use crate::materials::dielectrics::Dielectric;
 
 
