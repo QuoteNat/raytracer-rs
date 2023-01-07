@@ -1,8 +1,8 @@
 use std::io;
 use std::io::Write;
-mod vector;
 mod shapes;
-use vector::{Color, zero_vec, unit_vector, write_color};
+mod vector;
+use vector::{unit_vector, write_color, zero_vec, Color};
 mod ray;
 use ray::Ray;
 mod hit;
@@ -15,13 +15,12 @@ use materials::*;
 mod scenes;
 use crate::materials::Dielectric;
 
-
 /// Return ray color
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     // let mut rec = HitRecord {
-    //     p: Point3{e:[0.0,0.0,0.0]}, 
-    //     normal: Point3{e:[0.0,0.0,0.0]}, 
-    //     t: INFINITY, 
+    //     p: Point3{e:[0.0,0.0,0.0]},
+    //     normal: Point3{e:[0.0,0.0,0.0]},
+    //     t: INFINITY,
     //     material: Rc::new(Lambertian {albedo: zero_vec()})
     // };
 
@@ -31,25 +30,23 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     }
 
     match world.hit(r, 0.001, INFINITY) {
-        Some(rec) => {
-            match rec.material.scatter(r, &rec) {
-                Some(scatter) => {
-                    return *scatter.attenuation * ray_color(&scatter.scattered, world, depth-1);
-                },
-                None => {}
+        Some(rec) => match rec.material.scatter(r, &rec) {
+            Some(scatter) => {
+                return *scatter.attenuation * ray_color(&scatter.scattered, world, depth - 1);
             }
+            None => {}
         },
         None => {}
     }
 
     let unit_direction = unit_vector(r.direction);
     let t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * Color{e:[1.0, 1.0, 1.0]} + t * Color{e:[0.5, 0.7, 1.0]};
+    return (1.0 - t) * Color { e: [1.0, 1.0, 1.0] } + t * Color { e: [0.5, 0.7, 1.0] };
 }
 
 fn main() {
     // Image
-    let aspect_ratio = 16.0/9.0;
+    let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
     let samples_per_pixel = 50;
@@ -59,7 +56,7 @@ fn main() {
     let mut world = HittableList {
         objects: Vec::new(),
     };
-    
+
     let world = scenes::make_red_blue();
 
     let cam = scenes::random_scene_camera(aspect_ratio);
@@ -72,7 +69,7 @@ fn main() {
         io::stderr().flush().unwrap();
 
         for i in 0..image_width {
-            let mut pixel_color = Color {e:[0.0, 0.0, 0.0]};
+            let mut pixel_color = Color { e: [0.0, 0.0, 0.0] };
             for _ in 0..samples_per_pixel {
                 let u = (i as f64 + random_float_1()) / (image_width + 1) as f64;
                 let v = (j as f64 + random_float_1()) / (image_height - 1) as f64;

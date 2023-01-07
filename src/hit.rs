@@ -1,7 +1,7 @@
-use super::ray::Ray;
 use super::materials::Material;
+use super::ray::Ray;
+use crate::{materials::Lambertian, vector::*};
 pub use std::rc::Rc;
-use crate::{vector::*, materials::Lambertian};
 
 /// Hit record class
 pub struct HitRecord {
@@ -47,7 +47,7 @@ impl Hittable for HittableList {
         let mut temp_rec = HitRecord {
             p: zero_vec(),
             normal: zero_vec(),
-            material: Rc::new(Lambertian {albedo: zero_vec()}),
+            material: Rc::new(Lambertian { albedo: zero_vec() }),
             t: t_max,
             front_face: true,
         };
@@ -64,15 +64,15 @@ impl Hittable for HittableList {
                     temp_rec.normal = rec.normal;
                     temp_rec.p = rec.p;
                     temp_rec.front_face = rec.front_face;
-                }, 
-                None => {},
+                }
+                None => {}
             }
         }
 
         if hit_anything {
-            return Some(temp_rec)
+            return Some(temp_rec);
         } else {
-            return None
+            return None;
         }
     }
 }

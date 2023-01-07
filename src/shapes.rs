@@ -1,7 +1,7 @@
-use crate::vector::*;
 use crate::hit::*;
-use crate::Ray;
 use crate::materials::Material;
+use crate::vector::*;
+use crate::Ray;
 
 pub struct Sphere {
     pub center: Point3,
@@ -16,9 +16,9 @@ impl Hittable for Sphere {
         let oc = r.origin - self.center;
         let a = r.direction.length_squared();
         let half_b = dot(&oc, &r.direction);
-        let c = oc.length_squared() - (self.radius*self.radius);
-        let discriminant = half_b*half_b - a*c;
-        
+        let c = oc.length_squared() - (self.radius * self.radius);
+        let discriminant = half_b * half_b - a * c;
+
         if discriminant < 0.0 {
             return None;
         }
@@ -34,7 +34,6 @@ impl Hittable for Sphere {
             }
         }
 
-
         let t = root;
         let p = r.at(t);
         let normal = (p - self.center) / self.radius;
@@ -45,7 +44,7 @@ impl Hittable for Sphere {
             p,
             normal,
             material,
-            front_face: true
+            front_face: true,
         };
 
         rec.set_face_normal(r, &normal);

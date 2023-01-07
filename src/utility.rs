@@ -1,7 +1,7 @@
 extern crate rand;
+use crate::vector::{quick_vec, Vec3};
 use rand::thread_rng;
 use rand::Rng;
-use crate::vector::{Vec3, quick_vec};
 
 /// Max value of f64
 pub const INFINITY: f64 = f64::INFINITY;
@@ -15,17 +15,21 @@ pub fn degrees_to_radians(degrees: f64) -> f64 {
 /// Generates a random float in the range [min, max]
 pub fn random_float(min: f64, max: f64) -> f64 {
     let mut rng = thread_rng();
-    return rng.gen_range(min..max)
+    return rng.gen_range(min..max);
 }
 
 pub fn random_float_1() -> f64 {
     let mut rng = thread_rng();
-    return rng.gen_range(0.0..1.0)
+    return rng.gen_range(0.0..1.0);
 }
 
 pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
-    if x < min {return min}
-    if x > max {return max}
+    if x < min {
+        return min;
+    }
+    if x > max {
+        return max;
+    }
     return x;
 }
 

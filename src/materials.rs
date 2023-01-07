@@ -9,7 +9,7 @@ pub struct ScatterStruct {
     pub scattered: Rc<Ray>,
 }
 pub trait Material {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct>;
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct>;
 }
 
 pub struct Metal {
@@ -18,9 +18,12 @@ pub struct Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct> {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
         let reflected = reflect(&unit_vector(r_in.direction), &rec.normal);
-        let scattered = Rc::new(Ray{origin: rec.p, direction: reflected + self.fuzz*random_in_unit_sphere()});
+        let scattered = Rc::new(Ray {
+            origin: rec.p,
+            direction: reflected + self.fuzz * random_in_unit_sphere(),
+        });
         let attenuation = Rc::new(self.albedo);
         let scatter_str = ScatterStruct {
             attenuation: Rc::clone(&attenuation),
@@ -41,7 +44,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct> {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
         let mut scatter_direction = rec.normal + random_unit_vector();
 
         // Catch degenerate scatter direction
@@ -49,7 +52,10 @@ impl Material for Lambertian {
             scatter_direction = rec.normal;
         }
 
-        let scattered = Rc::new(Ray {origin: rec.p, direction: scatter_direction});
+        let scattered = Rc::new(Ray {
+            origin: rec.p,
+            direction: scatter_direction,
+        });
         let attenuation = Rc::new(self.albedo);
         let scatter_str = ScatterStruct {
             attenuation,
@@ -66,7 +72,7 @@ pub struct Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord)-> Option<ScatterStruct> {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
         // Set attenuation to full for all
         let attenuation = Rc::new(quick_vec(1.0, 1.0, 1.0));
 
@@ -83,7 +89,7 @@ impl Material for Dielectric {
         // Get cos of the angle between -unit_direction and the normal vector (set to 1.0 if over 1.0 somehow)
         let cos_theta = f64::min(dot(&(-unit_direction), &rec.normal), 1.0);
         // Get the sin of the angle
-        let sin_theta = f64::sqrt(1.0 - cos_theta*cos_theta);
+        let sin_theta = f64::sqrt(1.0 - cos_theta * cos_theta);
 
         // If refraction_ratio * sin_theta is greater than 1, refraction is not possible
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
@@ -103,12 +109,15 @@ impl Material for Dielectric {
             direction,
         });
 
-        return Some(ScatterStruct { attenuation, scattered });
+        return Some(ScatterStruct {
+            attenuation,
+            scattered,
+        });
     }
 }
 
 fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
     let r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
     let r0 = r0 * r0;
-    r0 + (1.0-r0) * f64::powi(1.0 - cosine, 5)
+    r0 + (1.0 - r0) * f64::powi(1.0 - cosine, 5)
 }
