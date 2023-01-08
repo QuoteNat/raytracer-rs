@@ -1,3 +1,4 @@
+use crate::scene::Scene;
 use crate::utility::random_float_1;
 
 use super::hit::*;
@@ -9,7 +10,7 @@ pub struct ScatterStruct {
     pub scattered: Rc<Ray>,
 }
 pub trait Material {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct>;
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> Color;
 }
 
 pub struct Metal {
