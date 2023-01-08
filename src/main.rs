@@ -10,13 +10,13 @@ use hit::*;
 mod utility;
 use utility::*;
 mod camera;
-use camera::{camera_creator};
+use camera::PerspectiveCamera;
 mod lights;
 mod materials;
 mod scenes;
 use lights::{Light, LightList};
 
-use crate::{lights::PointLight, vector::quick_vec};
+use crate::{camera::Camera, lights::PointLight, vector::quick_vec};
 
 /// Return ray color
 fn ray_color(r: &Ray, world: &HittableList, depth: i32, lightlist: &LightList) -> Color {
@@ -74,14 +74,12 @@ fn main() {
         color: quick_vec(1.0, 1.0, 1.0),
     }));
 
-    let cam = camera_creator(
-        quick_vec(0.0, 0.0, 0.0),
+    let cam = PerspectiveCamera::new(
+        quick_vec(0.0, 0.0, 0.5),
         quick_vec(0.0, 0.0, -1.0),
         quick_vec(0.0, 1.0, 0.0),
         90.0,
         1.9,
-        1.0,
-        1.0,
     );
 
     // Render

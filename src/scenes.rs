@@ -1,4 +1,3 @@
-use crate::camera::camera_creator;
 use crate::camera::RTOWCamera;
 use crate::hit::*;
 use crate::materials::*;
@@ -131,7 +130,7 @@ pub fn random_scene_camera(aspect_ratio: f64) -> RTOWCamera {
     let aperture = 0.1;
 
     // Return camera
-    camera_creator(
+    RTOWCamera::new(
         lookfrom,
         lookat,
         vup,
