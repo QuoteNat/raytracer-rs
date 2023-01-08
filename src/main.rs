@@ -70,8 +70,16 @@ fn main() {
     let world = scenes::make_red_blue();
     let mut lights = LightList::new();
     lights.add(Rc::new(PointLight {
-        position: quick_vec(0.0, 1.0, 0.0),
-        color: quick_vec(1.0, 1.0, 1.0),
+        position: quick_vec(0.0, 1.0, 0.25),
+        color: quick_vec(1.0, 0.0, 0.0),
+    }));
+    lights.add(Rc::new(PointLight {
+        position: quick_vec(1.0, -1.0, 0.25),
+        color: quick_vec(0.0, 1.0, 0.0),
+    }));
+    lights.add(Rc::new(PointLight {
+        position: quick_vec(-1.0, -1.0, 0.25),
+        color: quick_vec(0.0, 0.0, 1.0),
     }));
 
     let cam = PerspectiveCamera::new(

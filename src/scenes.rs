@@ -12,10 +12,10 @@ pub fn make_red_blue() -> HittableList {
     let r = f64::cos(PI / 4.0);
 
     let material_left = Rc::new(Lambertian {
-        albedo: quick_vec(0.0, 0.0, 1.0),
+        albedo: quick_vec(1.0, 1.0, 1.0),
     });
     let material_right = Rc::new(Lambertian {
-        albedo: quick_vec(1.0, 0.0, 0.0),
+        albedo: quick_vec(1.0, 1.0, 1.0),
     });
 
     world.add(Rc::new(Sphere {
