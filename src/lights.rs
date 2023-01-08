@@ -1,9 +1,11 @@
-use crate::vector::{Color, unit_vector, dot, zero_vec};
+use crate::vector::{dot, unit_vector, vec_clamp, zero_vec, Color, Vec3};
+use crate::Ray;
+use crate::{HitRecord, HittableList};
 use std::rc::Rc;
 
 /// Abstract Light trait.
 pub trait Light {
-    pub fn contribution(&self, r_in: &Ray, rec: &HitRecord, hitList: &HittableList) -> Color;
+    fn contribution(&self, r_in: &Ray, rec: &HitRecord, hit_list: &HittableList) -> Color;
 }
 
 /// List of lights in a scene
@@ -14,9 +16,7 @@ pub struct LightList {
 impl LightList {
     /// Creates a new empty LightList
     pub fn new() -> LightList {
-        LightList {
-            lights: Vec::new(),
-        }
+        LightList { lights: Vec::new() }
     }
 
     /// Adds a light to the light list
@@ -27,29 +27,29 @@ impl LightList {
 
 impl Light for LightList {
     /// Calculates light contribution from all lights in the scene
-    fn contribution(&self, r_in: &Ray, rec: &HitRecord, hitList: &HittableList) -> Color {
+    fn contribution(&self, r_in: &Ray, rec: &HitRecord, hit_list: &HittableList) -> Color {
         let mut cont = zero_vec();
 
         for light in &self.lights {
-            cont = cont + light.contribution(r_in, rec, hitList);
+            cont = cont + light.contribution(r_in, rec, hit_list);
         }
 
-        vec_clamp(cont, 0.0, 1.0);
+        vec_clamp(cont, 0.0, 1.0)
     }
 }
 
 /// Point light
 pub struct PointLight {
     pub position: Vec3,
-    pub color: Color
+    pub color: Color,
 }
 
 impl Light for PointLight {
     /// Returns light contribution based off of lambert's law in the form of a Color
-    fn contribution(&self, r_in: &Ray, rec: &HitRecord, hitList: &HittableList) -> Color {
+    fn contribution(&self, r_in: &Ray, rec: &HitRecord, hit_list: &HittableList) -> Color {
         let n = rec.normal;
         let l = unit_vector(self.position - rec.p);
-        
-        return self.color * f64::max(0.0, dot(n, l));
+
+        return self.color * f64::max(0.0, dot(&n, &l));
     }
 }

@@ -271,7 +271,9 @@ pub fn write_color(pixel_color: Color, samples_per_pixel: i32) {
 
 /// Clamp all values of a vec to the range [min, max]
 pub fn vec_clamp(vec: Vec3, min: f64, max: f64) -> Vec3 {
-    quick_vec(clamp(vec.x(), min, max), 
-    clamp(vec.y(), min, max), 
-    clamp(vec.z(), min, max))
+    quick_vec(
+        clamp(vec.x(), min, max),
+        clamp(vec.y(), min, max),
+        clamp(vec.z(), min, max),
+    )
 }

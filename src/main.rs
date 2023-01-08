@@ -2,7 +2,7 @@ use std::io;
 use std::io::Write;
 mod shapes;
 mod vector;
-use vector::{unit_vector, write_color, zero_vec, Color};
+use vector::{unit_vector, vec_clamp, write_color, zero_vec, Color};
 mod ray;
 use ray::Ray;
 mod hit;
@@ -10,13 +10,16 @@ use hit::*;
 mod utility;
 use utility::*;
 mod camera;
+use camera::{camera_creator, Camera};
+mod lights;
 mod materials;
-use materials::*;
 mod scenes;
-use crate::materials::Dielectric;
+use lights::{Light, LightList};
+
+use crate::{lights::PointLight, vector::quick_vec};
 
 /// Return ray color
-fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
+fn ray_color(r: &Ray, world: &HittableList, depth: i32, lightlist: &LightList) -> Color {
     // let mut rec = HitRecord {
     //     p: Point3{e:[0.0,0.0,0.0]},
     //     normal: Point3{e:[0.0,0.0,0.0]},
@@ -32,7 +35,13 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     match world.hit(r, 0.001, INFINITY) {
         Some(rec) => match rec.material.scatter(r, &rec) {
             Some(scatter) => {
-                return *scatter.attenuation * ray_color(&scatter.scattered, world, depth - 1);
+                return vec_clamp(
+                    *scatter.attenuation
+                        * ray_color(&scatter.scattered, world, depth - 1, lightlist)
+                        + *scatter.attenuation * lightlist.contribution(r, &rec, world),
+                    0.0,
+                    1.0,
+                );
             }
             None => {}
         },
@@ -59,8 +68,21 @@ fn main() {
     };
 
     let world = scenes::make_red_blue();
+    let mut lights = LightList::new();
+    lights.add(Rc::new(PointLight {
+        position: quick_vec(0.0, 1.0, 0.0),
+        color: quick_vec(1.0, 1.0, 1.0),
+    }));
 
-    let cam = scenes::random_scene_camera(aspect_ratio);
+    let cam = camera_creator(
+        quick_vec(0.0, 0.0, 0.0),
+        quick_vec(0.0, 0.0, -1.0),
+        quick_vec(0.0, 1.0, 0.0),
+        90.0,
+        1.9,
+        1.0,
+        1.0,
+    );
 
     // Render
     println!("P3\n{} {}\n255\n", image_width, image_height);
@@ -75,7 +97,7 @@ fn main() {
                 let u = (i as f64 + random_float_1()) / (image_width + 1) as f64;
                 let v = (j as f64 + random_float_1()) / (image_height - 1) as f64;
                 let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world, max_depth);
+                pixel_color += ray_color(&r, &world, max_depth, &lights);
             }
             write_color(pixel_color, samples_per_pixel);
         }
