@@ -14,6 +14,7 @@ use camera::PerspectiveCamera;
 mod lights;
 mod materials;
 mod scenes;
+mod scene;
 use lights::{Light, LightList};
 
 use crate::{camera::Camera, lights::PointLight, vector::quick_vec};
