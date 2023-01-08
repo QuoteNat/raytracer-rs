@@ -10,7 +10,7 @@ pub struct ScatterStruct {
     pub scattered: Rc<Ray>,
 }
 pub trait Material {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> Color;
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color;
 }
 
 pub struct Metal {
@@ -19,7 +19,7 @@ pub struct Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         let reflected = reflect(&unit_vector(r_in.direction), &rec.normal);
         let scattered = Rc::new(Ray {
             origin: rec.p,
@@ -45,7 +45,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
         let mut scatter_direction = rec.normal + random_unit_vector();
 
         // Catch degenerate scatter direction
@@ -73,7 +73,7 @@ pub struct Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
         // Set attenuation to full for all
         let attenuation = Rc::new(quick_vec(1.0, 1.0, 1.0));
 

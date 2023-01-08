@@ -32,17 +32,8 @@ impl Scene<'_> {
         }
 
         match self.objects.hit(r, 0.001, INFINITY) {
-            Some(rec) => match rec.material.scatter(r, &rec) {
-                Some(scatter) => {
-                    return vec_clamp(
-                        *scatter.attenuation * self.ray_color(&scatter.scattered, depth - 1)
-                            + *scatter.attenuation
-                                * self.lights.contribution(r, &rec, self.objects),
-                        0.0,
-                        1.0,
-                    );
-                }
-                None => {}
+            Some(rec) => {
+                return rec.material.apply(r, &rec, &self, depth);
             },
             None => {}
         }
