@@ -1,5 +1,5 @@
 use crate::camera::camera_creator;
-use crate::camera::Camera;
+use crate::camera::RTOWCamera;
 use crate::hit::*;
 use crate::materials::*;
 use crate::shapes::Sphere;
@@ -123,7 +123,7 @@ pub fn random_scene() -> HittableList {
     world
 }
 
-pub fn random_scene_camera(aspect_ratio: f64) -> Camera {
+pub fn random_scene_camera(aspect_ratio: f64) -> RTOWCamera {
     let lookfrom = quick_vec(13.0, 2.0, 3.0);
     let lookat = quick_vec(0.0, 0.0, 0.0);
     let vup = quick_vec(0.0, 1.0, 0.0);

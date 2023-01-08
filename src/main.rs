@@ -10,7 +10,7 @@ use hit::*;
 mod utility;
 use utility::*;
 mod camera;
-use camera::{camera_creator, Camera};
+use camera::{camera_creator};
 mod lights;
 mod materials;
 mod scenes;

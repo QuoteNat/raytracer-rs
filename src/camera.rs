@@ -3,7 +3,7 @@ use crate::utility::{degrees_to_radians, random_in_unit_disk};
 use crate::vector::*;
 
 #[derive(Copy, Clone)]
-pub struct Camera {
+pub struct RTOWCamera {
     origin: Point3,
     horizontal: Vec3,
     vertical: Vec3,
@@ -14,7 +14,7 @@ pub struct Camera {
     lens_radius: f64,
 }
 
-impl Camera {
+impl RTOWCamera {
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
         let rd = self.lens_radius * random_in_unit_disk();
         let offset = self.u * rd.x() + self.v * rd.y();
@@ -42,7 +42,7 @@ pub fn camera_creator(
     aspect_ratio: f64,
     aperture: f64,
     focus_dist: f64,
-) -> Camera {
+) -> RTOWCamera {
     let theta = degrees_to_radians(vfov);
     let h = f64::tan(theta / 2.0);
     let viewport_height = 2.0 * h;
@@ -59,7 +59,7 @@ pub fn camera_creator(
 
     let lens_radius = aperture / 2.0;
 
-    Camera {
+    RTOWCamera {
         origin,
         horizontal,
         vertical,
