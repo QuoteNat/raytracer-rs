@@ -17,9 +17,15 @@ pub struct PerspectiveCamera {
 
 impl PerspectiveCamera {
     /// Creates a new PerspectiveCamera
-    pub fn new(lookfrom: Point3, lookat: Point3, vup: Vec3, vfov: f64, aspect_ratio: f64) -> PerspectiveCamera {
+    pub fn new(
+        lookfrom: Point3,
+        lookat: Point3,
+        vup: Vec3,
+        vfov: f64,
+        aspect_ratio: f64,
+    ) -> PerspectiveCamera {
         let theta = degrees_to_radians(vfov);
-        let h = f64::tan(theta/2.0);
+        let h = f64::tan(theta / 2.0);
         let viewport_height = 2.0 * h;
         let viewport_width = aspect_ratio * viewport_height;
 
@@ -32,10 +38,11 @@ impl PerspectiveCamera {
         let vertical = viewport_height * v;
         let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - w;
 
-        PerspectiveCamera { origin, 
-            horizontal, 
-            vertical, 
-            lower_left_corner
+        PerspectiveCamera {
+            origin,
+            horizontal,
+            vertical,
+            lower_left_corner,
         }
     }
 }
@@ -45,10 +52,7 @@ impl Camera for PerspectiveCamera {
         let origin = self.origin;
         let direction = self.lower_left_corner + s * self.horizontal + t * self.vertical - origin;
 
-        Ray {
-            origin,
-            direction
-        }
+        Ray { origin, direction }
     }
 }
 

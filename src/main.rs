@@ -13,47 +13,12 @@ mod camera;
 use camera::PerspectiveCamera;
 mod lights;
 mod materials;
-mod scenes;
 mod scene;
+mod scenes;
 use lights::{Light, LightList};
+use scene::Scene;
 
 use crate::{camera::Camera, lights::PointLight, vector::quick_vec};
-
-/// Return ray color
-fn ray_color(r: &Ray, world: &HittableList, depth: i32, lightlist: &LightList) -> Color {
-    // let mut rec = HitRecord {
-    //     p: Point3{e:[0.0,0.0,0.0]},
-    //     normal: Point3{e:[0.0,0.0,0.0]},
-    //     t: INFINITY,
-    //     material: Rc::new(Lambertian {albedo: zero_vec()})
-    // };
-
-    // Recursion limit
-    if depth <= 0 {
-        return zero_vec();
-    }
-
-    match world.hit(r, 0.001, INFINITY) {
-        Some(rec) => match rec.material.scatter(r, &rec) {
-            Some(scatter) => {
-                return vec_clamp(
-                    *scatter.attenuation
-                        * ray_color(&scatter.scattered, world, depth - 1, lightlist)
-                        + *scatter.attenuation * lightlist.contribution(r, &rec, world),
-                    0.0,
-                    1.0,
-                );
-            }
-            None => {}
-        },
-        None => {}
-    }
-
-    let unit_direction = unit_vector(r.direction);
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    // return (1.0 - t) * Color { e: [1.0, 1.0, 1.0] } + t * Color { e: [0.5, 0.7, 1.0] };
-    return zero_vec();
-}
 
 fn main() {
     // Image
@@ -91,6 +56,8 @@ fn main() {
         1.9,
     );
 
+    let scene = Scene::new(Box::new(cam), &world, &lights);
+
     // Render
     println!("P3\n{} {}\n255\n", image_width, image_height);
 
@@ -103,8 +70,8 @@ fn main() {
             for _ in 0..samples_per_pixel {
                 let u = (i as f64 + random_float_1()) / (image_width + 1) as f64;
                 let v = (j as f64 + random_float_1()) / (image_height - 1) as f64;
-                let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world, max_depth, &lights);
+                let r = scene.get_ray(u, v);
+                pixel_color += scene.ray_color(&r, max_depth);
             }
             write_color(pixel_color, samples_per_pixel);
         }
