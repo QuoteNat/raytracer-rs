@@ -36,7 +36,7 @@ pub struct Diffuse {
 impl Material for Diffuse {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         // lambertian light contribution
-        let cr = self.albedo * scene.lights.contribution(r_in, rec, scene);
+        let cr = self.albedo * scene.lights.apply(r_in, rec, scene).contribution;
 
         let mut scatter_direction = rec.normal + random_unit_vector();
 
@@ -137,7 +137,41 @@ impl Lambertian {
 impl Material for Lambertian {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         // lambertian light contribution
-        let cr = self.albedo * scene.lights.contribution(r_in, rec, scene);
+        let cr = self.albedo * scene.lights.apply(r_in, rec, scene).contribution;
         vec_clamp(cr, 0.0, 1.0)
+    }
+}
+
+pub struct BlinnPhong {
+    diffuse: Color,
+    specular: Color,
+    phongExp: f64,
+}
+
+impl BlinnPhong {
+    pub fn new(diffuse: Color, specular: Color, phongExp: f64) -> BlinnPhong {
+        BlinnPhong {
+            diffuse,
+            specular,
+            phongExp,
+        }
+    }
+}
+
+impl Material for BlinnPhong {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
+        let mut lR = zero_vec();
+        for light in &scene.lights.lights {
+            let detail = light.as_ref().apply(r_in, rec, scene);
+            let l = unit_vector(detail.position - rec.p);
+            let v = unit_vector(-1.0 * r_in.direction);
+            let half = unit_vector(l + v);
+            let n_dot_h_to_p = f64::powf(dot(&rec.normal, &half), self.phongExp);
+            let spec_component = self.specular * f64::max(0.0, n_dot_h_to_p);
+
+            lR = lR + (self.diffuse + spec_component) * detail.contribution;
+        }
+
+        return vec_clamp(lR, 0.0, 1.0);
     }
 }

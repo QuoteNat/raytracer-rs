@@ -155,10 +155,11 @@ pub fn make_bubble() -> HittableList {
     };
     let absorbance = 0.5;
     let material_ground: Rc<dyn Material> = Rc::new(Lambertian::new(quick_vec(0.8, 0.8, 0.0)));
-    let material_center: Rc<dyn Material> = Rc::new(Diffuse {
-        albedo: quick_vec(0.1, 0.2, 0.5),
-        absorbance,
-    });
+    let material_center: Rc<dyn Material> = Rc::new(BlinnPhong::new(
+        quick_vec(0.1, 0.2, 0.5),
+        quick_vec(1.0, 1.0, 1.0),
+        10.0,
+    ));
     let material_left: Rc<dyn Material> = Rc::new(Dielectric { ir: 1.5 });
     let material_right: Rc<dyn Material> = Rc::new(Metal {
         albedo: quick_vec(0.8, 0.6, 0.2),

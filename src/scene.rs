@@ -45,8 +45,8 @@ impl Scene<'_> {
 
         let unit_direction = unit_vector(r.direction);
         let t = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0 - t) * Color { e: [1.0, 1.0, 1.0] } + t * Color { e: [0.5, 0.7, 1.0] };
-        //return zero_vec();
+        //return (1.0 - t) * Color { e: [1.0, 1.0, 1.0] } + t * Color { e: [0.5, 0.7, 1.0] };
+        return zero_vec();
     }
 
     pub fn any_hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {

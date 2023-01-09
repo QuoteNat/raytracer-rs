@@ -1,17 +1,22 @@
 use crate::scene::Scene;
-use crate::vector::{dot, unit_vector, vec_clamp, zero_vec, Color, Vec3};
+use crate::vector::{dot, unit_vector, vec_clamp, zero_vec, Color, Point3, Vec3};
+use crate::HitRecord;
 use crate::Ray;
-use crate::{HitRecord, HittableList};
 use std::rc::Rc;
+
+pub struct LightDetails {
+    pub contribution: Color,
+    pub position: Point3,
+}
 
 /// Abstract Light trait.
 pub trait Light {
-    fn contribution(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> Color;
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> LightDetails;
 }
 
 /// List of lights in a scene
 pub struct LightList {
-    lights: Vec<Rc<dyn Light>>,
+    pub lights: Vec<Rc<dyn Light>>,
 }
 
 impl LightList {
@@ -28,14 +33,17 @@ impl LightList {
 
 impl Light for LightList {
     /// Calculates light contribution from all lights in the scene
-    fn contribution(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> Color {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> LightDetails {
         let mut cont = zero_vec();
 
         for light in &self.lights {
-            cont = cont + light.contribution(r_in, rec, scene);
+            cont = cont + light.apply(r_in, rec, scene).contribution;
         }
 
-        vec_clamp(cont, 0.0, 1.0)
+        LightDetails {
+            contribution: vec_clamp(cont, 0.0, 1.0),
+            position: zero_vec(),
+        }
     }
 }
 
@@ -47,7 +55,7 @@ pub struct PointLight {
 
 impl Light for PointLight {
     /// Returns light contribution based off of lambert's law in the form of a Color
-    fn contribution(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> Color {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> LightDetails {
         let n = rec.normal;
         let l = unit_vector(self.position - rec.p);
 
@@ -60,9 +68,15 @@ impl Light for PointLight {
             0.001,
             (self.position - rec.p).length(),
         ) {
-            return zero_vec();
+            return LightDetails {
+                contribution: zero_vec(),
+                position: self.position,
+            };
         }
 
-        return self.color * f64::max(0.0, dot(&n, &l));
+        return LightDetails {
+            contribution: self.color * f64::max(0.0, dot(&n, &l)),
+            position: self.position,
+        };
     }
 }
