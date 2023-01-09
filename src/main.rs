@@ -27,7 +27,7 @@ use crate::{camera::Camera, lights::PointLight, vector::quick_vec};
 fn main() {
     // Image
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 1000;
+    let image_width = 1920;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
     let samples_per_pixel = 10;
     let max_depth = 10;
@@ -38,16 +38,16 @@ fn main() {
     let mut lights = LightList::new();
     lights.add(Rc::new(PointLight {
         position: quick_vec(0.0, 2.0, 0.25),
-        color: quick_vec(1.0, 1.0, 1.0),
+        color: quick_vec(0.0, 1.0, 0.0),
     }));
-    // lights.add(Rc::new(PointLight {
-    //     position: quick_vec(1.0, -1.0, 0.25),
-    //     color: quick_vec(0.0, 1.0, 0.0),
-    // }));
-    // lights.add(Rc::new(PointLight {
-    //     position: quick_vec(-1.0, -1.0, 0.25),
-    //     color: quick_vec(0.0, 0.0, 1.0),
-    // }));
+    lights.add(Rc::new(PointLight {
+        position: quick_vec(-1.0, 2.0, 0.25),
+        color: quick_vec(1.0, 0.0, 0.0),
+    }));
+    lights.add(Rc::new(PointLight {
+        position: quick_vec(1.0, 2.0, 0.25),
+        color: quick_vec(0.0, 0.0, 1.0),
+    }));
 
     let cam = PerspectiveCamera::new(
         quick_vec(0.0, 0.0, 0.5),
