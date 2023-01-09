@@ -1,22 +1,26 @@
-use std::io;
-use std::io::Write;
-mod shapes;
-mod vector;
-use vector::{unit_vector, vec_clamp, write_color, zero_vec, Color};
-mod ray;
-use ray::Ray;
-mod hit;
-use hit::*;
-mod utility;
-use utility::*;
+mod buffer;
 mod camera;
-use camera::PerspectiveCamera;
+mod hit;
 mod lights;
 mod materials;
+mod ray;
 mod scene;
 mod scenes;
-use lights::{Light, LightList};
+mod shapes;
+mod utility;
+mod vector;
+
+use std::io;
+use std::io::Write;
+
+use buffer::Buffer;
+use camera::PerspectiveCamera;
+use hit::*;
+use lights::LightList;
+use ray::Ray;
 use scene::Scene;
+use utility::*;
+use vector::{write_color, Color};
 
 use crate::{camera::Camera, lights::PointLight, vector::quick_vec};
 
@@ -27,6 +31,8 @@ fn main() {
     let image_height = (image_width as f64 / aspect_ratio) as i32;
     let samples_per_pixel = 10;
     let max_depth = 10;
+
+    let mut buffer = Buffer::new(image_width as u32, image_height as u32);
 
     let world = scenes::make_bubble();
     let mut lights = LightList::new();
@@ -68,6 +74,8 @@ fn main() {
                 let r = scene.get_ray(u, v);
                 pixel_color += scene.ray_color(&r, max_depth);
             }
+
+            buffer.write(pixel_color, i, j as u32);
             write_color(pixel_color, samples_per_pixel);
         }
     }

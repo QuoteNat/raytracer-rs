@@ -1,6 +1,8 @@
+use crate::vector::{zero_vec, Color};
+
 /// Buffer struct for storing image color data
 pub struct Buffer {
-    e: Vec<f64>,
+    e: Vec<Color>,
     width: u32,
     height: u32,
 }
@@ -8,7 +10,7 @@ pub struct Buffer {
 impl Buffer {
     pub fn new(width: u32, height: u32) -> Buffer {
         Buffer {
-            e: vec![0.0; (width * height) as usize],
+            e: vec![zero_vec(); (width * height) as usize],
             width,
             height,
         }
@@ -20,13 +22,13 @@ impl Buffer {
     }
 
     /// Change value at [x, y] to value
-    pub fn write(&mut self, value: f64, x: u32, y: u32) {
+    pub fn write(&mut self, value: Color, x: u32, y: u32) {
         let index = self.index(y, x);
         self.e[index] = value;
     }
 
     /// Returns value at [x, y]
-    pub fn at(&self, x: u32, y: u32) -> f64 {
+    pub fn at(&self, x: u32, y: u32) -> Color {
         self.e[self.index(y, x)]
     }
 }
