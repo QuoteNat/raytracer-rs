@@ -1,6 +1,6 @@
 use crate::lights::Light;
 use crate::scene::Scene;
-use crate::utility::{random_float_1};
+use crate::utility::random_float_1;
 
 use super::hit::*;
 use super::ray::Ray;
@@ -36,7 +36,7 @@ pub struct Diffuse {
 impl Material for Diffuse {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         // lambertian light contribution
-        let cr = self.albedo * scene.lights.contribution(r_in, rec, scene.objects);
+        let cr = self.albedo * scene.lights.contribution(r_in, rec, scene);
 
         let mut scatter_direction = rec.normal + random_unit_vector();
 
@@ -52,7 +52,11 @@ impl Material for Diffuse {
 
         let scattered_Color = scene.ray_color(&scattered, depth);
 
-        return vec_clamp(cr * self.absorbance + (1.0-self.absorbance) * self.albedo * scattered_Color , 0.0, 1.0);
+        return vec_clamp(
+            cr * self.absorbance + (1.0 - self.absorbance) * self.albedo * scattered_Color,
+            0.0,
+            1.0,
+        );
     }
 }
 

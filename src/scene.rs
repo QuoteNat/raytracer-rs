@@ -49,6 +49,13 @@ impl Scene<'_> {
         //return zero_vec();
     }
 
+    pub fn any_hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
+        match self.objects.hit(r, 0.001, INFINITY) {
+            Some(_) => return true,
+            None => return false,
+        }
+    }
+
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
         self.camera.get_ray(s, t)
     }
