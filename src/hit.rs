@@ -1,6 +1,6 @@
 use super::materials::Material;
 use super::ray::Ray;
-use crate::{materials::Lambertian, vector::*};
+use crate::{materials::Diffuse, vector::*};
 pub use std::rc::Rc;
 
 /// Hit record class
@@ -47,7 +47,10 @@ impl Hittable for HittableList {
         let mut temp_rec = HitRecord {
             p: zero_vec(),
             normal: zero_vec(),
-            material: Rc::new(Lambertian { albedo: zero_vec() }),
+            material: Rc::new(Diffuse {
+                albedo: zero_vec(),
+                absorbance: 0.5,
+            }),
             t: t_max,
             front_face: true,
         };

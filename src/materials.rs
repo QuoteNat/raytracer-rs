@@ -5,10 +5,6 @@ use super::hit::*;
 use super::ray::Ray;
 use super::vector::*;
 
-pub struct ScatterStruct {
-    pub attenuation: Rc<Color>,
-    pub scattered: Rc<Ray>,
-}
 pub trait Material {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color;
 }
@@ -21,31 +17,23 @@ pub struct Metal {
 impl Material for Metal {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         let reflected = reflect(&unit_vector(r_in.direction), &rec.normal);
-        let scattered = Rc::new(Ray {
+        let scattered = Ray {
             origin: rec.p,
             direction: reflected + self.fuzz * random_in_unit_sphere(),
-        });
-        let attenuation = Rc::new(self.albedo);
-        let scatter_str = ScatterStruct {
-            attenuation: Rc::clone(&attenuation),
-            scattered: Rc::clone(&scattered),
         };
 
-        if dot(&scattered.direction, &rec.normal) > 0.0 {
-            return Some(scatter_str);
-        } else {
-            return None;
-        }
+        return self.albedo * scene.ray_color(&scattered, depth);
     }
 }
 
 #[derive(Clone, Copy)]
-pub struct Lambertian {
+pub struct Diffuse {
     pub albedo: Color,
+    pub absorbance: f64,
 }
 
-impl Material for Lambertian {
-    fn apply(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
+impl Material for Diffuse {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         let mut scatter_direction = rec.normal + random_unit_vector();
 
         // Catch degenerate scatter direction
@@ -53,16 +41,13 @@ impl Material for Lambertian {
             scatter_direction = rec.normal;
         }
 
-        let scattered = Rc::new(Ray {
+        let scattered = Ray {
             origin: rec.p,
             direction: scatter_direction,
-        });
-        let attenuation = Rc::new(self.albedo);
-        let scatter_str = ScatterStruct {
-            attenuation,
-            scattered,
         };
-        return Some(scatter_str);
+
+        return self.absorbance * scene.ray_color(&scattered, depth)
+            + self.albedo * (1.0 - self.absorbance);
     }
 }
 
@@ -73,10 +58,7 @@ pub struct Dielectric {
 }
 
 impl Material for Dielectric {
-    fn apply(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterStruct> {
-        // Set attenuation to full for all
-        let attenuation = Rc::new(quick_vec(1.0, 1.0, 1.0));
-
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         // Let refraction ratio equal 1/ir if outside the object, or ir if inside the object
         let refraction_ratio;
         if rec.front_face {
@@ -105,15 +87,12 @@ impl Material for Dielectric {
         }
 
         // Return the scattered ray
-        let scattered = Rc::new(Ray {
+        let scattered = Ray {
             origin: rec.p,
             direction,
-        });
+        };
 
-        return Some(ScatterStruct {
-            attenuation,
-            scattered,
-        });
+        return scene.ray_color(&scattered, depth);
     }
 }
 

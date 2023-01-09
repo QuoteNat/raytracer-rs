@@ -33,20 +33,20 @@ fn main() {
         objects: Vec::new(),
     };
 
-    let world = scenes::make_red_blue();
+    let world = scenes::make_bubble();
     let mut lights = LightList::new();
-    lights.add(Rc::new(PointLight {
-        position: quick_vec(0.0, 1.0, 0.25),
-        color: quick_vec(1.0, 0.0, 0.0),
-    }));
-    lights.add(Rc::new(PointLight {
-        position: quick_vec(1.0, -1.0, 0.25),
-        color: quick_vec(0.0, 1.0, 0.0),
-    }));
-    lights.add(Rc::new(PointLight {
-        position: quick_vec(-1.0, -1.0, 0.25),
-        color: quick_vec(0.0, 0.0, 1.0),
-    }));
+    // lights.add(Rc::new(PointLight {
+    //     position: quick_vec(0.0, 1.0, 0.25),
+    //     color: quick_vec(1.0, 1.0, 1.0),
+    // }));
+    // lights.add(Rc::new(PointLight {
+    //     position: quick_vec(1.0, -1.0, 0.25),
+    //     color: quick_vec(0.0, 1.0, 0.0),
+    // }));
+    // lights.add(Rc::new(PointLight {
+    //     position: quick_vec(-1.0, -1.0, 0.25),
+    //     color: quick_vec(0.0, 0.0, 1.0),
+    // }));
 
     let cam = PerspectiveCamera::new(
         quick_vec(0.0, 0.0, 0.5),

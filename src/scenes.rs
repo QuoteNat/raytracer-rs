@@ -6,16 +6,19 @@ use crate::utility::*;
 use crate::vector::{quick_vec, random_vec, random_vec_1};
 
 pub fn make_red_blue() -> HittableList {
+    let absorbance = 0.5;
     let mut world = HittableList {
         objects: Vec::new(),
     };
     let r = f64::cos(PI / 4.0);
 
-    let material_left = Rc::new(Lambertian {
+    let material_left = Rc::new(Diffuse {
         albedo: quick_vec(1.0, 1.0, 1.0),
+        absorbance,
     });
-    let material_right = Rc::new(Lambertian {
+    let material_right = Rc::new(Diffuse {
         albedo: quick_vec(1.0, 1.0, 1.0),
+        absorbance,
     });
 
     world.add(Rc::new(Sphere {
@@ -38,8 +41,10 @@ pub fn random_scene() -> HittableList {
         objects: Vec::new(),
     };
 
-    let ground_material: Rc<dyn Material> = Rc::new(Lambertian {
+    let absorbance = 0.5;
+    let ground_material: Rc<dyn Material> = Rc::new(Diffuse {
         albedo: quick_vec(0.5, 0.5, 0.5),
+        absorbance,
     });
     world.add(Rc::new(Sphere {
         center: quick_vec(0.0, -1000.0, 0.0),
@@ -62,7 +67,7 @@ pub fn random_scene() -> HittableList {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = random_vec_1();
-                    sphere_material = Rc::new(Lambertian { albedo });
+                    sphere_material = Rc::new(Diffuse { albedo, absorbance });
                     world.add(Rc::new(Sphere {
                         center,
                         radius: 0.2,
@@ -100,8 +105,9 @@ pub fn random_scene() -> HittableList {
         material: material1,
     }));
 
-    let material2 = Rc::new(Lambertian {
+    let material2 = Rc::new(Diffuse {
         albedo: quick_vec(0.4, 0.2, 0.1),
+        absorbance,
     });
     world.add(Rc::new(Sphere {
         center: quick_vec(-4.0, 1.0, 0.0),
@@ -146,12 +152,14 @@ pub fn make_bubble() -> HittableList {
     let mut world = HittableList {
         objects: Vec::new(),
     };
-
-    let material_ground: Rc<dyn Material> = Rc::new(Lambertian {
+    let absorbance = 0.5;
+    let material_ground: Rc<dyn Material> = Rc::new(Diffuse {
         albedo: quick_vec(0.8, 0.8, 0.0),
+        absorbance,
     });
-    let material_center: Rc<dyn Material> = Rc::new(Lambertian {
+    let material_center: Rc<dyn Material> = Rc::new(Diffuse {
         albedo: quick_vec(0.1, 0.2, 0.5),
+        absorbance,
     });
     let material_left: Rc<dyn Material> = Rc::new(Dielectric { ir: 1.5 });
     let material_right: Rc<dyn Material> = Rc::new(Metal {
