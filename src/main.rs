@@ -25,7 +25,7 @@ fn main() {
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 50;
+    let samples_per_pixel = 10;
     let max_depth = 10;
 
     let world = scenes::make_bubble();

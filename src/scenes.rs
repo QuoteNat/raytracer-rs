@@ -2,6 +2,7 @@ use crate::camera::RTOWCamera;
 use crate::hit::*;
 use crate::materials::*;
 use crate::shapes::Sphere;
+use crate::shapes::Triangle;
 use crate::utility::*;
 use crate::vector::{quick_vec, random_vec, random_vec_1};
 
@@ -166,6 +167,18 @@ pub fn make_bubble() -> HittableList {
         albedo: quick_vec(0.8, 0.6, 0.2),
         fuzz: 0.0,
     });
+
+    let material_triangle: Rc<dyn Material> = Rc::new(Metal {
+        albedo: quick_vec(1.0, 0.5, 0.5),
+        fuzz: 0.0,
+    });
+
+    world.add(Rc::new(Triangle {
+        point1: quick_vec(2.0, 0.0, -2.0),
+        point2: quick_vec(-2.0, 0.0, -2.0),
+        point3: quick_vec(0.0, 1.5, -0.5),
+        material: Rc::clone(&material_triangle),
+    }));
 
     let sphere_ground: Rc<dyn Hittable> = Rc::new(Sphere {
         center: quick_vec(0.0, -100.5, -1.0),
