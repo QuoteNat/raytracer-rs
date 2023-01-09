@@ -99,7 +99,7 @@ impl Material for Dielectric {
             let direction = reflect(&unit_direction, &rec.normal);
             let ray = Ray {
                 origin: rec.p,
-                direction
+                direction,
             };
             return scene.ray_color(&ray, depth);
         } else {
@@ -109,14 +109,14 @@ impl Material for Dielectric {
             let reflect_direction = reflect(&unit_direction, &rec.normal);
             let reflect_ray = Ray {
                 origin: rec.p,
-                direction: reflect_direction
+                direction: reflect_direction,
             };
             let reflect_color = scene.ray_color(&reflect_ray, depth);
             // refract color
             let refract_direction = refract(&unit_direction, &rec.normal, refraction_ratio);
             let refract_ray = Ray {
                 origin: rec.p,
-                direction: refract_direction
+                direction: refract_direction,
             };
             let refract_color = scene.ray_color(&refract_ray, depth);
 

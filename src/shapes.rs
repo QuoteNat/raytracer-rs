@@ -52,3 +52,10 @@ impl Hittable for Sphere {
         return Some(rec);
     }
 }
+
+pub struct Triangle {
+    pub point1: Point3,
+    pub point2: Point3,
+    pub point3: Point3,
+    pub Material: Rc<dyn Material>,
+}
