@@ -85,14 +85,6 @@ impl Material for Dielectric {
 
         // If refraction_ratio * sin_theta is greater than 1, refraction is not possible
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
-        // // If refraction is not possible, or if reflectance is greater than a random f64 from 0 to 1
-        // if cannot_refract || reflectance(cos_theta, refraction_ratio) > random_float_1() {
-        //     // Reflect
-        //     direction = reflect(&unit_direction, &rec.normal);
-        // } else {
-        //     // Refract (bug is probably here)
-        //     direction = refract(&unit_direction, &rec.normal, refraction_ratio);
-        // }
 
         // Full reflection
         if cannot_refract {
@@ -123,14 +115,6 @@ impl Material for Dielectric {
             // return combination of reflection and refraction
             return reflect_color * reflectance + refract_color * (1.0 - reflectance);
         }
-
-        // Return the scattered ray
-        // let scattered = Ray {
-        //     origin: rec.p,
-        //     direction,
-        // };
-
-        // return scene.ray_color(&scattered, depth);
     }
 }
 
@@ -138,4 +122,22 @@ fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
     let r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
     let r0 = r0 * r0;
     r0 + (1.0 - r0) * f64::powi(1.0 - cosine, 5)
+}
+
+pub struct Lambertian {
+    albedo: Color,
+}
+
+impl Lambertian {
+    pub fn new(albedo: Color) -> Lambertian {
+        Lambertian { albedo }
+    }
+}
+
+impl Material for Lambertian {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
+        // lambertian light contribution
+        let cr = self.albedo * scene.lights.contribution(r_in, rec, scene);
+        vec_clamp(cr, 0.0, 1.0)
+    }
 }

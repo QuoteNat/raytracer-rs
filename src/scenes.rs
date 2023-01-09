@@ -154,10 +154,7 @@ pub fn make_bubble() -> HittableList {
         objects: Vec::new(),
     };
     let absorbance = 0.5;
-    let material_ground: Rc<dyn Material> = Rc::new(Diffuse {
-        albedo: quick_vec(0.8, 0.8, 0.0),
-        absorbance,
-    });
+    let material_ground: Rc<dyn Material> = Rc::new(Lambertian::new(quick_vec(0.8, 0.8, 0.0)));
     let material_center: Rc<dyn Material> = Rc::new(Diffuse {
         albedo: quick_vec(0.1, 0.2, 0.5),
         absorbance,
