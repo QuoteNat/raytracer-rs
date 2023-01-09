@@ -85,23 +85,52 @@ impl Material for Dielectric {
 
         // If refraction_ratio * sin_theta is greater than 1, refraction is not possible
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
-        let direction: Vec3;
-        // If refraction is not possible, or if reflectance is greater than a random f64 from 0 to 1
-        if cannot_refract || reflectance(cos_theta, refraction_ratio) > random_float_1() {
-            // Reflect
-            direction = reflect(&unit_direction, &rec.normal);
+        // // If refraction is not possible, or if reflectance is greater than a random f64 from 0 to 1
+        // if cannot_refract || reflectance(cos_theta, refraction_ratio) > random_float_1() {
+        //     // Reflect
+        //     direction = reflect(&unit_direction, &rec.normal);
+        // } else {
+        //     // Refract (bug is probably here)
+        //     direction = refract(&unit_direction, &rec.normal, refraction_ratio);
+        // }
+
+        // Full reflection
+        if cannot_refract {
+            let direction = reflect(&unit_direction, &rec.normal);
+            let ray = Ray {
+                origin: rec.p,
+                direction
+            };
+            return scene.ray_color(&ray, depth);
         } else {
-            // Refract (bug is probably here)
-            direction = refract(&unit_direction, &rec.normal, refraction_ratio);
+            // get reflectance ratio based
+            let reflectance = reflectance(cos_theta, refraction_ratio);
+            // reflect color
+            let reflect_direction = reflect(&unit_direction, &rec.normal);
+            let reflect_ray = Ray {
+                origin: rec.p,
+                direction: reflect_direction
+            };
+            let reflect_color = scene.ray_color(&reflect_ray, depth);
+            // refract color
+            let refract_direction = refract(&unit_direction, &rec.normal, refraction_ratio);
+            let refract_ray = Ray {
+                origin: rec.p,
+                direction: refract_direction
+            };
+            let refract_color = scene.ray_color(&refract_ray, depth);
+
+            // return combination of reflection and refraction
+            return reflect_color * reflectance + refract_color * (1.0 - reflectance);
         }
 
         // Return the scattered ray
-        let scattered = Ray {
-            origin: rec.p,
-            direction,
-        };
+        // let scattered = Ray {
+        //     origin: rec.p,
+        //     direction,
+        // };
 
-        return scene.ray_color(&scattered, depth);
+        // return scene.ray_color(&scattered, depth);
     }
 }
 
