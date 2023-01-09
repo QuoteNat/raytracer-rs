@@ -7,8 +7,8 @@ use crate::Camera;
 
 pub struct Scene<'a> {
     camera: Box<dyn Camera>,
-    objects: &'a HittableList,
-    lights: &'a LightList,
+    pub objects: &'a HittableList,
+    pub lights: &'a LightList,
 }
 
 impl Scene<'_> {

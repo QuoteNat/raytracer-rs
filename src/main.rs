@@ -35,10 +35,10 @@ fn main() {
 
     let world = scenes::make_bubble();
     let mut lights = LightList::new();
-    // lights.add(Rc::new(PointLight {
-    //     position: quick_vec(0.0, 1.0, 0.25),
-    //     color: quick_vec(1.0, 1.0, 1.0),
-    // }));
+    lights.add(Rc::new(PointLight {
+        position: quick_vec(0.0, 2.0, 0.25),
+        color: quick_vec(1.0, 1.0, 1.0),
+    }));
     // lights.add(Rc::new(PointLight {
     //     position: quick_vec(1.0, -1.0, 0.25),
     //     color: quick_vec(0.0, 1.0, 0.0),
