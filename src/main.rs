@@ -60,7 +60,7 @@ fn main() {
     let scene = Scene::new(Box::new(cam), &world, &lights);
 
     // Render
-    println!("P3\n{} {}\n255\n", image_width, image_height);
+    //println!("P3\n{} {}\n255\n", image_width, image_height);
 
     for j in (0..image_height).rev() {
         eprint!("\rScanlines remaining: {} ", j);
@@ -75,10 +75,12 @@ fn main() {
                 pixel_color += scene.ray_color(&r, max_depth);
             }
 
-            buffer.write(pixel_color, i, j as u32);
-            write_color(pixel_color, samples_per_pixel);
+            buffer.write((1.0 / samples_per_pixel as f64) * pixel_color, i, j as u32);
+            //write_color(pixel_color, samples_per_pixel);
         }
     }
+
+    buffer.buffer_to_png(String::from("image.png"));
 
     // Make it so progress indicator doesn't end up before terminal prompt
     eprintln!("\nDone")
