@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -8,6 +9,7 @@ use json::{object, JsonValue};
 use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
 use crate::lights::{self, LightList, PointLight};
+use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::utility::INFINITY;
 use crate::vector::{quick_vec, unit_vector, vec_clamp, zero_vec, Color, Vec3};
@@ -113,7 +115,7 @@ impl Scene<'_> {
             Ok(parsed) => parsed,
         };
 
-        // Create camera
+        // CAMERA PARSING
         let mut width = 0;
         let mut height = 0;
         let mut samples = 0;
@@ -146,7 +148,7 @@ impl Scene<'_> {
             }
         };
 
-        // Create lights
+        // LIGHT PARSING
         let lights = LightList::new();
         let parsed_lights = parsed["lights"];
         if parsed_lights.has_key("pointLights") {
@@ -157,7 +159,59 @@ impl Scene<'_> {
             }
         }
 
-        //let materials
+        // MATERIAL PARSING
+        // Materials hashmap. Keys will be used later to add materials to shapes.
+        let materials: HashMap<String, Rc<dyn Material>> = HashMap::new();
+        let parsed_materials = parsed["materials"];
+
+        // Parse lambertian materials
+        if parsed_materials.has_key("lambertian") {
+            for entry in parsed_materials["lambertian"].members() {
+                let name = entry["name"].as_str().unwrap().to_string();
+                let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
+                materials.insert(name, Rc::new(Lambertian::new(albedo)));
+            }
+        }
+
+        // Parse Blinn-Phong materials
+        if parsed_materials.has_key("blinnPhong") {
+            for entry in parsed_materials["blinnPhong"].members() {
+                let name = entry["name"].as_str().unwrap().to_string();
+                let diffuse = Scene::string_to_vec(entry["diffuse"].as_str().unwrap());
+                let specular = Scene::string_to_vec(entry["specular"].as_str().unwrap());
+                let phongExp = entry["phongExp"].as_f64().unwrap();
+                materials.insert(name, Rc::new(BlinnPhong::new(diffuse, specular, phongExp)));
+            }
+        }
+
+        // Parse dielectric materials
+        if parsed_materials.has_key("dielectric") {
+            for entry in parsed_materials["dielectric"].members() {
+                let name = entry["name"].as_str().unwrap().to_string();
+                let ir = entry["ir"].as_f64().unwrap();
+                materials.insert(name, Rc::new(Dielectric { ir }));
+            }
+        }
+
+        // Parse metal materials
+        if parsed_materials.has_key("metal") {
+            for entry in parsed_materials["metal"].members() {
+                let name = entry["name"].as_str().unwrap().to_string();
+                let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
+                let fuzz = entry["fuzz"].as_f64().unwrap();
+                materials.insert(name, Rc::new(Metal { albedo, fuzz }));
+            }
+        }
+
+        // Parse diffuse materials
+        if parsed_materials.has_key("diffuse") {
+            for entry in parsed_materials["diffuse"].members() {
+                let name = entry["name"].as_str().unwrap().to_string();
+                let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
+                let absorbance = entry["absorbance"].as_f64().unwrap();
+                materials.insert(name, Rc::new(Diffuse { albedo, absorbance }));
+            }
+        }
 
         Scene {
             camera,
