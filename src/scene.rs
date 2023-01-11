@@ -11,6 +11,7 @@ use crate::hit::{Hittable, HittableList};
 use crate::lights::{self, LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
 use crate::ray::Ray;
+use crate::shapes::{Sphere, Triangle};
 use crate::utility::INFINITY;
 use crate::vector::{quick_vec, unit_vector, vec_clamp, zero_vec, Color, Vec3};
 use crate::Camera;
@@ -149,7 +150,7 @@ impl Scene<'_> {
         };
 
         // LIGHT PARSING
-        let lights = LightList::new();
+        let mut lights = LightList::new();
         let parsed_lights = parsed["lights"];
         if parsed_lights.has_key("pointLights") {
             for entry in parsed_lights["pointLight"].members() {
@@ -213,9 +214,53 @@ impl Scene<'_> {
             }
         }
 
+        // SHAPE PARSING
+        let mut objects = HittableList {
+            objects: Vec::new(),
+        };
+        let parsed_objects = parsed["objects"];
+        // triangles
+        if parsed_objects.has_key("triangle") {
+            for entry in parsed_objects["triangle"].members() {
+                let point1 = Scene::string_to_vec(entry["p1"].as_str().unwrap());
+                let point2 = Scene::string_to_vec(entry["p2"].as_str().unwrap());
+                let point3 = Scene::string_to_vec(entry["p3"].as_str().unwrap());
+                let material = entry["material"].as_str().unwrap().to_string();
+                let triangle = Triangle {
+                    point1,
+                    point2,
+                    point3,
+                    material: Rc::clone(&materials[&material]),
+                };
+
+                objects.add(Rc::new(triangle));
+            }
+        }
+
+        // sphere
+        if parsed_objects.has_key("sphere") {
+            for entry in parsed_objects["sphere"].members() {
+                let center = Scene::string_to_vec(entry["p1"].as_str().unwrap());
+                let radius = entry["radius"].as_f64().unwrap();
+                let material = entry["material"].as_str().unwrap().to_string();
+                let sphere = Sphere {
+                    center,
+                    radius,
+                    material: Rc::clone(&materials[&material]),
+                };
+
+                objects.add(Rc::new(sphere));
+            }
+        }
+
         Scene {
             camera,
             lights: &lights,
+            objects: &objects,
+            width,
+            height,
+            samples,
+            max_depth,
         }
     }
 }
