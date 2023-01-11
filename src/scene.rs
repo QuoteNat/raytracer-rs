@@ -156,10 +156,6 @@ impl Scene {
         let mut lights = LightList::new();
         let parsed_lights = &parsed["lights"];
         if parsed_lights.has_key("pointLight") {
-            eprintln!(
-                "Number of point lights: {}",
-                parsed_lights["pointLight"].len()
-            );
             for entry in parsed_lights["pointLight"].members() {
                 let position = Scene::string_to_vec(entry["position"].as_str().unwrap());
                 let color = Scene::string_to_vec(entry["color"].as_str().unwrap());
@@ -261,6 +257,8 @@ impl Scene {
         }
 
         eprintln!("{} lights", lights.len());
+        eprintln!("{} materials", materials.len());
+        eprintln!("{} objects", objects.len());
         // eprintln!("{}")
         Scene {
             camera,
