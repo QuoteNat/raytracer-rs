@@ -1,12 +1,13 @@
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
+use std::rc::Rc;
 
 use json::{object, JsonValue};
 
 use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
-use crate::lights::{Light, LightList};
+use crate::lights::{self, LightList, PointLight};
 use crate::ray::Ray;
 use crate::utility::INFINITY;
 use crate::vector::{quick_vec, unit_vector, vec_clamp, zero_vec, Color, Vec3};
@@ -145,8 +146,22 @@ impl Scene<'_> {
             }
         };
 
+        // Create lights
+        let lights = LightList::new();
         let parsed_lights = parsed["lights"];
+        if parsed_lights.has_key("pointLights") {
+            for entry in parsed_lights["pointLight"].members() {
+                let position = Scene::string_to_vec(entry["position"].as_str().unwrap());
+                let color = Scene::string_to_vec(entry["color"].as_str().unwrap());
+                lights.add(Rc::new(PointLight { position, color }));
+            }
+        }
 
-        Scene {}
+        //let materials
+
+        Scene {
+            camera,
+            lights: &lights,
+        }
     }
 }
