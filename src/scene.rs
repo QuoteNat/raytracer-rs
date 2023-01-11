@@ -1,41 +1,42 @@
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::Read;
+use std::io::{self, Read, Write};
 use std::path::Path;
 use std::rc::Rc;
 
 use json::{object, JsonValue};
 
+use crate::buffer::Buffer;
 use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
 use crate::lights::{self, LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::shapes::{Sphere, Triangle};
-use crate::utility::INFINITY;
+use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, unit_vector, vec_clamp, zero_vec, Color, Vec3};
 use crate::Camera;
 
-pub struct Scene<'a> {
+pub struct Scene {
     camera: Box<dyn Camera>,
-    pub objects: &'a HittableList,
-    pub lights: &'a LightList,
+    pub objects: Box<HittableList>,
+    pub lights: Box<LightList>,
     width: i32,
     height: i32,
     samples: i32,
     max_depth: i32,
 }
 
-impl Scene<'_> {
+impl Scene {
     pub fn new<'a>(
         camera: Box<dyn Camera>,
-        objects: &'a HittableList,
-        lights: &'a LightList,
+        objects: Box<HittableList>,
+        lights: Box<LightList>,
         width: i32,
         height: i32,
         samples: i32,
         max_depth: i32,
-    ) -> Scene<'a> {
+    ) -> Scene {
         Scene {
             camera,
             objects,
@@ -89,6 +90,7 @@ impl Scene<'_> {
     fn string_to_vec(string: &str) -> Vec3 {
         let split = string.split(" ");
         let split: Vec<&str> = split.collect();
+        //eprintln!("{}, {}, {}", split[0], split[1], split[2]);
         quick_vec(
             split[0].parse::<f64>().unwrap(),
             split[1].parse::<f64>().unwrap(),
@@ -96,6 +98,7 @@ impl Scene<'_> {
         )
     }
 
+    /// Parses in the json scenefile at path
     pub fn read_scene_file(path: &String) -> Scene {
         // Read in scene file
         let path = Path::new(path);
@@ -122,7 +125,7 @@ impl Scene<'_> {
         let mut samples = 0;
         let mut max_depth = 0;
         let camera: Box<dyn Camera>;
-        let parsed_camera = parsed["camera"];
+        let parsed_camera = &parsed["camera"];
         match parsed_camera["type"].as_str().unwrap() {
             "perspective" => {
                 // TODO: Add actual match statements to this (to be procrastinated until the heat death of the universe)
@@ -151,8 +154,12 @@ impl Scene<'_> {
 
         // LIGHT PARSING
         let mut lights = LightList::new();
-        let parsed_lights = parsed["lights"];
-        if parsed_lights.has_key("pointLights") {
+        let parsed_lights = &parsed["lights"];
+        if parsed_lights.has_key("pointLight") {
+            eprintln!(
+                "Number of point lights: {}",
+                parsed_lights["pointLight"].len()
+            );
             for entry in parsed_lights["pointLight"].members() {
                 let position = Scene::string_to_vec(entry["position"].as_str().unwrap());
                 let color = Scene::string_to_vec(entry["color"].as_str().unwrap());
@@ -162,8 +169,8 @@ impl Scene<'_> {
 
         // MATERIAL PARSING
         // Materials hashmap. Keys will be used later to add materials to shapes.
-        let materials: HashMap<String, Rc<dyn Material>> = HashMap::new();
-        let parsed_materials = parsed["materials"];
+        let mut materials: HashMap<String, Rc<dyn Material>> = HashMap::new();
+        let parsed_materials = &parsed["materials"];
 
         // Parse lambertian materials
         if parsed_materials.has_key("lambertian") {
@@ -218,7 +225,7 @@ impl Scene<'_> {
         let mut objects = HittableList {
             objects: Vec::new(),
         };
-        let parsed_objects = parsed["objects"];
+        let parsed_objects = &parsed["objects"];
         // triangles
         if parsed_objects.has_key("triangle") {
             for entry in parsed_objects["triangle"].members() {
@@ -240,7 +247,7 @@ impl Scene<'_> {
         // sphere
         if parsed_objects.has_key("sphere") {
             for entry in parsed_objects["sphere"].members() {
-                let center = Scene::string_to_vec(entry["p1"].as_str().unwrap());
+                let center = Scene::string_to_vec(entry["center"].as_str().unwrap());
                 let radius = entry["radius"].as_f64().unwrap();
                 let material = entry["material"].as_str().unwrap().to_string();
                 let sphere = Sphere {
@@ -253,14 +260,43 @@ impl Scene<'_> {
             }
         }
 
+        eprintln!("{} lights", lights.len());
+        // eprintln!("{}")
         Scene {
             camera,
-            lights: &lights,
-            objects: &objects,
+            lights: Box::new(lights),
+            objects: Box::new(objects),
             width,
             height,
             samples,
             max_depth,
         }
+    }
+
+    pub fn render(&self) {
+        let mut buffer = Buffer::new(self.width as u32, self.height as u32);
+        for j in (0..self.height).rev() {
+            eprint!("\rScanlines remaining: {} ", j);
+            io::stderr().flush().unwrap();
+
+            for i in 0..self.width {
+                let mut pixel_color = Color { e: [0.0, 0.0, 0.0] };
+                for _ in 0..self.samples {
+                    let u = (i as f64 + random_float_1()) / (self.width + 1) as f64;
+                    let v = (j as f64 + random_float_1()) / (self.height - 1) as f64;
+                    let r = self.get_ray(u, v);
+                    pixel_color += self.ray_color(&r, self.max_depth);
+                }
+
+                buffer.write(
+                    (1.0 / self.samples as f64) * pixel_color,
+                    i as u32,
+                    j as u32,
+                );
+                //write_color(pixel_color, samples_per_pixel);
+            }
+        }
+
+        buffer.buffer_to_png(String::from("image.png"));
     }
 }
