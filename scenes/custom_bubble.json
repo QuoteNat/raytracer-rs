@@ -5,9 +5,9 @@
         "lookat": "0.0 0.0 -1.0",
         "vup": "0.0 1.0 0.0",
         "vfov": 90.0,
-        "width": 1920,
-        "height": 1080,
-        "samples": 10,
+        "width": 400,
+        "height": 400,
+        "samples": 100,
         "max_depth": 10
     },
     "lights": {
@@ -58,6 +58,13 @@
                 "albedo": "1.0 0.5 0.5",
                 "fuzz": 0.0
             }
+        ],
+        "diffuse": [
+            {
+                "name": "front",
+                "albedo": "1.0 1.0 1.0",
+                "absorbance": 0.5
+            }
         ]
     },
     "objects": {
@@ -94,6 +101,11 @@
                 "center": "1.0 0.0 -1.0",
                 "radius": 0.5,
                 "material": "right"
+            },
+            {
+                "center": "0.0 -0.3 -0.5",
+                "radius": 0.2,
+                "material": "front"
             }
         ]
     }
