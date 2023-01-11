@@ -29,6 +29,10 @@ impl LightList {
     pub fn add(&mut self, object: Rc<dyn Light>) {
         self.lights.push(object);
     }
+
+    pub fn len(&self) -> usize {
+        self.lights.len()
+    }
 }
 
 impl Light for LightList {

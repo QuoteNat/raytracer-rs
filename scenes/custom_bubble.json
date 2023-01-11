@@ -1,0 +1,112 @@
+{
+    "camera": {
+        "type": "perspective",
+        "lookfrom": "0.0 0.0 0.5",
+        "lookat": "0.0 0.0 -1.0",
+        "vup": "0.0 1.0 0.0",
+        "vfov": 90.0,
+        "width": 400,
+        "height": 400,
+        "samples": 100,
+        "max_depth": 10
+    },
+    "lights": {
+        "pointLight": [
+            {
+                "position": "0.0 2.0 0.25",
+                "color": "0.0 1.0 0.0"
+            },
+            {
+                "position": "-1.0 2.0 0.25",
+                "color": "1.0 0.0 0.0"
+            },
+            {
+                "position": "1.0 2.0 0.25",
+                "color": "0.0 0.0 1.0"
+            }
+        ]
+    },
+    "materials": {
+        "lambertian": [
+            {
+                "name": "ground",
+                "albedo": "1.0 1.0 1.0"
+            }
+        ],
+        "blinnPhong": [
+            {
+                "name": "center",
+                "diffuse": "0.1 0.2 0.5",
+                "specular": "1.0 1.0 1.0",
+                "phongExp": 10.0
+            }
+        ],
+        "dielectric": [
+            {
+                "name": "left",
+                "ir": 1.5
+            }
+        ],
+        "metal": [
+            {
+                "name": "right",
+                "albedo": "0.8 0.6 0.2",
+                "fuzz": 0.0
+            },
+            {
+                "name": "triangle",
+                "albedo": "1.0 0.5 0.5",
+                "fuzz": 0.0
+            }
+        ],
+        "diffuse": [
+            {
+                "name": "front",
+                "albedo": "1.0 1.0 1.0",
+                "absorbance": 0.5
+            }
+        ]
+    },
+    "objects": {
+        "triangle": [
+            {
+                "p1": "2.0 0.0 -2.0",
+                "p2": "-2.0 0.0 -2.0",
+                "p3": "0.0 1.5 -0.5",
+                "material": "triangle"
+            }
+        ],
+        "sphere": [
+            {
+                "center": "0.0 -100.5 -1.0",
+                "radius": 100.0,
+                "material": "ground"
+            },
+            {
+                "center": "0.0 0.0 -1.0",
+                "radius": 0.5,
+                "material": "center"
+            },
+            {
+                "center": "-1.0 0.0 -1.0",
+                "radius": 0.5,
+                "material": "left"
+            },
+            {
+                "center": "-1.0 0.0 -1.0",
+                "radius": -0.4,
+                "material": "left"
+            },
+            {
+                "center": "1.0 0.0 -1.0",
+                "radius": 0.5,
+                "material": "right"
+            },
+            {
+                "center": "0.0 -0.3 -0.5",
+                "radius": 0.2,
+                "material": "front"
+            }
+        ]
+    }
+}
