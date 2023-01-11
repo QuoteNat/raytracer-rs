@@ -1,6 +1,10 @@
 {
     "camera": {
         "type": "perspective",
+        "lookfrom": "0.0 0.0 0.5",
+        "lookat": "0.0 0.0 -1.0",
+        "vup": "0.0 1.0 0.0",
+        "vfov": 90.0,
         "width": 1920,
         "height": 1080,
         "samples": 10,
