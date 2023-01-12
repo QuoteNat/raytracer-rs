@@ -1,3 +1,4 @@
+mod aabb;
 mod buffer;
 mod camera;
 mod hit;
