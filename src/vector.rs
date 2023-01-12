@@ -7,6 +7,10 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
+    /// Creates a new Vec3 with values (x, y, z)
+    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
+        Vec3 { e: [x, y, z] }
+    }
     /// Returns x value of the vector
     pub fn x(&self) -> f64 {
         return self.e[0];
