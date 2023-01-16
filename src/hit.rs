@@ -1,5 +1,6 @@
 use super::materials::Material;
 use super::ray::Ray;
+use crate::aabb::AABB;
 use crate::{materials::Diffuse, vector::*};
 pub use std::rc::Rc;
 
@@ -28,6 +29,8 @@ impl HitRecord {
 pub trait Hittable {
     /// Implements ray intersect function for a given object
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+
+    fn bounding_box(&self) -> AABB;
 }
 
 pub struct HittableList {
@@ -81,5 +84,15 @@ impl Hittable for HittableList {
         } else {
             return None;
         }
+    }
+
+    fn bounding_box(&self) -> AABB {
+        let mut temp_box = AABB::new(zero_vec(), zero_vec());
+
+        for object in &self.objects {
+            temp_box = AABB::surround(&temp_box, &object.bounding_box());
+        }
+
+        return temp_box;
     }
 }

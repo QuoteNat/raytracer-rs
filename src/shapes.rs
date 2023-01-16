@@ -1,3 +1,4 @@
+use crate::aabb::AABB;
 use crate::hit::*;
 use crate::materials::Material;
 use crate::vector::*;
@@ -50,6 +51,13 @@ impl Hittable for Sphere {
         rec.set_face_normal(r, &normal);
 
         return Some(rec);
+    }
+
+    fn bounding_box(&self) -> AABB {
+        let center = self.center;
+        let rad_vec = Vec3::new(self.radius, self.radius, self.radius);
+
+        AABB::new(center - rad_vec, center + rad_vec)
     }
 }
 
@@ -130,5 +138,9 @@ impl Hittable for Triangle {
         rec.set_face_normal(r, &n);
 
         return Some(rec);
+    }
+
+    fn bounding_box(&self) -> AABB {
+        AABB::new_from_points(&vec![self.point1, self.point2, self.point3])
     }
 }

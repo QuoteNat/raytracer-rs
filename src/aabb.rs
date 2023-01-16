@@ -1,9 +1,12 @@
 use std::mem::swap;
 
-use crate::{ray::Ray, vector::Point3};
+use crate::{
+    ray::Ray,
+    vector::{zero_vec, Point3},
+};
 
 /// Axis aligned bounding box
-struct AABB {
+pub struct AABB {
     minimum: Point3,
     maximum: Point3,
 }
@@ -12,6 +15,23 @@ impl AABB {
     /// Creates a new AABB from minimum to maximum
     pub fn new(minimum: Point3, maximum: Point3) -> AABB {
         AABB { minimum, maximum }
+    }
+
+    /// Creates a new AABB that bounds a set of points
+    pub fn new_from_points(points: &Vec<Point3>) -> AABB {
+        let mut maximum = zero_vec();
+        let mut minimum = zero_vec();
+        for point in points {
+            for i in 0..3 {
+                if point[i] < minimum[i] {
+                    minimum[i] = point[i];
+                } else if point[i] > maximum[i] {
+                    maximum[i] = point[i];
+                }
+            }
+        }
+
+        AABB::new(minimum, maximum)
     }
 
     /// Returns the minimum point of the AABB
@@ -46,5 +66,16 @@ impl AABB {
         }
 
         return true;
+    }
+
+    /// Create a bounding box that encompasses two bounding boxes
+    pub fn surround(box1: &AABB, box2: &AABB) -> AABB {
+        // Reusing functions, can always use the more optimized code from the book later (this is a lie I won't rememer to do this)
+        AABB::new_from_points(&vec![
+            box1.minimum,
+            box1.maximum,
+            box2.minimum,
+            box2.maximum,
+        ])
     }
 }
