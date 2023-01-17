@@ -153,7 +153,7 @@ pub fn make_bubble() -> HittableList {
     let mut world = HittableList {
         objects: Vec::new(),
     };
-    let absorbance = 0.5;
+    // let absorbance = 0.5;
     let material_ground: Rc<dyn Material> = Rc::new(Lambertian::new(quick_vec(1.0, 1.0, 1.0)));
     let material_center: Rc<dyn Material> = Rc::new(BlinnPhong::new(
         quick_vec(0.1, 0.2, 0.5),

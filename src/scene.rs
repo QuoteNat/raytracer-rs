@@ -4,18 +4,18 @@ use std::io::{self, Read, Write};
 use std::path::Path;
 use std::rc::Rc;
 
-use json::{object, JsonValue};
+use json;
 
 use crate::buffer::Buffer;
 use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
-use crate::lights::{self, LightList, PointLight};
+use crate::lights::{LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::shapes::{Sphere, Triangle};
 use crate::utility::{random_float_1, INFINITY};
-use crate::vector::{quick_vec, unit_vector, vec_clamp, zero_vec, Color, Vec3};
-use crate::Camera;
+use crate::vector::{quick_vec, zero_vec, Color, Vec3};
+use crate::camera::Camera;
 
 pub struct Scene {
     camera: Box<dyn Camera>,
@@ -67,12 +67,13 @@ impl Scene {
             None => {}
         }
 
-        let unit_direction = unit_vector(r.direction);
-        let t = 0.5 * (unit_direction.y() + 1.0);
+        //let unit_direction = unit_vector(r.direction);
+        //let t = 0.5 * (unit_direction.y() + 1.0);
         //return (1.0 - t) * Color { e: [1.0, 1.0, 1.0] } + t * Color { e: [0.5, 0.7, 1.0] };
         return zero_vec();
     }
 
+    #[allow(unused_variables)]
     pub fn any_hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
         match self.objects.hit(r, 0.001, INFINITY) {
             Some(_) => return true,
@@ -120,10 +121,10 @@ impl Scene {
         };
 
         // CAMERA PARSING
-        let mut width = 0;
-        let mut height = 0;
-        let mut samples = 0;
-        let mut max_depth = 0;
+        let width;
+        let height;
+        let samples;
+        let max_depth;
         let camera: Box<dyn Camera>;
         let parsed_camera = &parsed["camera"];
         match parsed_camera["type"].as_str().unwrap() {
@@ -183,8 +184,8 @@ impl Scene {
                 let name = entry["name"].as_str().unwrap().to_string();
                 let diffuse = Scene::string_to_vec(entry["diffuse"].as_str().unwrap());
                 let specular = Scene::string_to_vec(entry["specular"].as_str().unwrap());
-                let phongExp = entry["phongExp"].as_f64().unwrap();
-                materials.insert(name, Rc::new(BlinnPhong::new(diffuse, specular, phongExp)));
+                let phong_exp = entry["phongExp"].as_f64().unwrap();
+                materials.insert(name, Rc::new(BlinnPhong::new(diffuse, specular, phong_exp)));
             }
         }
 

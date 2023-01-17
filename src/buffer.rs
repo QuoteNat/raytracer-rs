@@ -55,7 +55,7 @@ impl Buffer {
 
         let mut writer = encoder.write_header().unwrap();
 
-        /// Copy buffer as i32
+        // Copy buffer as i32
         let mut data: Vec<u8> = Vec::new();
         for element in &self.e {
             data.push((256.0 * clamp(element.x(), 0.0, 0.999)) as u8);

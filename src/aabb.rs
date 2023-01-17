@@ -61,7 +61,7 @@ impl AABB {
                 true => t1,
                 false => t_max,
             };
-            if (t_max <= t_min) {
+            if t_max <= t_min {
                 return false;
             }
         }

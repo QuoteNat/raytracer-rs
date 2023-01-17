@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+
+
 mod aabb;
 mod buffer;
 mod bvh;
@@ -13,19 +16,10 @@ mod utility;
 mod vector;
 
 use std::env;
-use std::io;
-use std::io::Write;
 
-use buffer::Buffer;
-use camera::PerspectiveCamera;
 use hit::*;
-use lights::LightList;
 use ray::Ray;
 use scene::Scene;
-use utility::*;
-use vector::{write_color, Color};
-
-use crate::{camera::Camera, lights::PointLight, vector::quick_vec};
 
 fn main() {
     let args: Vec<String> = env::args().collect();

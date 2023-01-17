@@ -94,7 +94,7 @@ impl Hittable for Triangle {
         let t = -(dot(&n, &r.origin) + d) / n_dot_ray_direction;
 
         // check if triangle is behind the ray
-        if t < t_min {
+        if t < t_min || t > t_max {
             return None;
         }
 

@@ -1,6 +1,5 @@
 use crate::lights::Light;
 use crate::scene::Scene;
-use crate::utility::random_float_1;
 
 use super::hit::*;
 use super::ray::Ray;
@@ -50,10 +49,10 @@ impl Material for Diffuse {
             direction: scatter_direction,
         };
 
-        let scattered_Color = scene.ray_color(&scattered, depth);
+        let scattered_color = scene.ray_color(&scattered, depth);
 
         return vec_clamp(
-            cr * self.absorbance + (1.0 - self.absorbance) * self.albedo * scattered_Color,
+            cr * self.absorbance + (1.0 - self.absorbance) * self.albedo * scattered_color,
             0.0,
             1.0,
         );
@@ -135,6 +134,7 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
+    #[allow(unused_variables)]
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         // lambertian light contribution
         let cr = self.albedo * scene.lights.apply(r_in, rec, scene).contribution;
@@ -145,33 +145,34 @@ impl Material for Lambertian {
 pub struct BlinnPhong {
     diffuse: Color,
     specular: Color,
-    phongExp: f64,
+    phong_exp: f64,
 }
 
 impl BlinnPhong {
-    pub fn new(diffuse: Color, specular: Color, phongExp: f64) -> BlinnPhong {
+    pub fn new(diffuse: Color, specular: Color, phong_exp: f64) -> BlinnPhong {
         BlinnPhong {
             diffuse,
             specular,
-            phongExp,
+            phong_exp,
         }
     }
 }
 
 impl Material for BlinnPhong {
+    #[allow(unused_variables)]
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
-        let mut lR = zero_vec();
+        let mut l_r = zero_vec();
         for light in &scene.lights.lights {
             let detail = light.as_ref().apply(r_in, rec, scene);
             let l = unit_vector(detail.position - rec.p);
             let v = unit_vector(-1.0 * r_in.direction);
             let half = unit_vector(l + v);
-            let n_dot_h_to_p = f64::powf(dot(&rec.normal, &half), self.phongExp);
+            let n_dot_h_to_p = f64::powf(dot(&rec.normal, &half), self.phong_exp);
             let spec_component = self.specular * f64::max(0.0, n_dot_h_to_p);
 
-            lR = lR + (self.diffuse + spec_component) * detail.contribution;
+            l_r = l_r + (self.diffuse + spec_component) * detail.contribution;
         }
 
-        return vec_clamp(lR, 0.0, 1.0);
+        return vec_clamp(l_r, 0.0, 1.0);
     }
 }
