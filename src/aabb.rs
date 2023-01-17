@@ -6,6 +6,7 @@ use crate::{
 };
 
 /// Axis aligned bounding box
+#[derive(Copy, Clone)]
 pub struct AABB {
     minimum: Point3,
     maximum: Point3,

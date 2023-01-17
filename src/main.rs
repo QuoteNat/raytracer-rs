@@ -1,5 +1,6 @@
 mod aabb;
 mod buffer;
+mod bvh;
 mod camera;
 mod hit;
 mod lights;
