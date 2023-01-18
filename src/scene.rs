@@ -6,6 +6,7 @@ use std::rc::Rc;
 
 use json;
 
+use crate::background::{Background, GradientY, BackgroundColor};
 use crate::buffer::Buffer;
 use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
@@ -26,6 +27,7 @@ pub struct Scene {
     height: i32,
     samples: i32,
     max_depth: i32,
+    background: Box<dyn Background>,
 }
 
 impl Scene {
@@ -37,6 +39,7 @@ impl Scene {
         height: i32,
         samples: i32,
         max_depth: i32,
+        background: Box<dyn Background>,
     ) -> Scene {
         Scene {
             camera,
@@ -46,6 +49,7 @@ impl Scene {
             height,
             samples,
             max_depth,
+            background
         }
     }
 
@@ -68,10 +72,7 @@ impl Scene {
             None => {}
         }
 
-        //let unit_direction = unit_vector(r.direction);
-        //let t = 0.5 * (unit_direction.y() + 1.0);
-        //return (1.0 - t) * Color { e: [1.0, 1.0, 1.0] } + t * Color { e: [0.5, 0.7, 1.0] };
-        return zero_vec();
+        return self.background.apply(r.direction);
     }
 
     #[allow(unused_variables)]
@@ -152,6 +153,22 @@ impl Scene {
             _ => {
                 panic!("Camera not defined")
             }
+        };
+
+        
+        let background_parsed = &parsed["background"];
+        let background_type = background_parsed["type"].as_str().unwrap();
+        let background: Box<dyn Background> = match background_type {
+            "gradientY" => {
+                let color1 = Scene::string_to_vec(background_parsed["color1"].as_str().unwrap());
+                let color2 = Scene::string_to_vec(background_parsed["color2"].as_str().unwrap());
+                Box::new(GradientY::new(color1, color2))
+            }
+            "backgroundColor" => {
+                let color = Scene::string_to_vec(background_parsed["color"].as_str().unwrap());
+                Box::new(BackgroundColor::new(color))
+            }
+            _ => {Box::new(BackgroundColor::new(zero_vec()))}
         };
 
         // LIGHT PARSING
@@ -295,6 +312,7 @@ impl Scene {
             height,
             samples,
             max_depth,
+            background
         }
     }
 
