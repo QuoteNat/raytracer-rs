@@ -13,7 +13,7 @@ use crate::lights::{LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::shapes::{Sphere, Triangle};
-use crate::texture::{Texture, SolidColor};
+use crate::texture::{Texture, SolidColor, Checker};
 use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
 use crate::camera::Camera;
@@ -168,11 +168,23 @@ impl Scene {
         let mut textures: HashMap<String, Rc<dyn Texture>> = HashMap::new();
         let parsed_textures = &parsed["textures"];
 
+        // TODO: Possibly change textures so that they are initialized in the order they appear in the json file, and not by type.
+        // This would better support textures that use other textures.
         if parsed_textures.has_key("color") {
             for entry in parsed_textures["color"].members() {
                 let name = entry["name"].as_str().unwrap().to_string();
                 let color = Scene::string_to_vec(entry["color"].as_str().unwrap());
                 textures.insert(name, Rc::new(SolidColor::new(color)));
+            }
+        }
+
+        // Note: Since checker textures can point to other textures, they should be initialized last. This is gonna be a problem later.
+        if parsed_textures.has_key("checker") {
+            for entry in parsed_textures["checker"].members() {
+                let name = entry["name"].as_str().unwrap().to_string();
+                let odd = Rc::clone(&textures[&entry["odd"].as_str().unwrap().to_string()]);
+                let even = Rc::clone(&textures[&entry["even"].as_str().unwrap().to_string()]);
+                textures.insert(name, Rc::new(Checker::new_from_textures(&odd, &even)));
             }
         }
 
