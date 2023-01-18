@@ -2,7 +2,7 @@ use crate::vector::{Point3, Color};
 
 pub trait Texture {
     /// Returns the color at a given texture coordinate u, v
-    fn value(&self, u: f64, v: f64, p: Point3) -> Color;
+    fn value(&self, uv: &TextureCoord, p: &Point3) -> Color;
 }
 
 pub struct TextureCoord {
@@ -28,7 +28,8 @@ impl SolidColor {
 }
 
 impl Texture for SolidColor {
-    fn value(&self, u: f64, v: f64, p: Point3) -> Color {
+    #[allow(unused_variables)]
+    fn value(&self, uv: &TextureCoord, p: &Point3) -> Color {
         self.color
     }
 }

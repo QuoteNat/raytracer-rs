@@ -13,6 +13,7 @@ use crate::lights::{LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::shapes::{Sphere, Triangle};
+use crate::texture::{Texture, SolidColor};
 use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
 use crate::camera::Camera;
@@ -164,6 +165,17 @@ impl Scene {
             }
         }
 
+        let mut textures: HashMap<String, Rc<dyn Texture>> = HashMap::new();
+        let parsed_textures = &parsed["textures"];
+
+        if parsed_textures.has_key("color") {
+            for entry in parsed_textures["color"].members() {
+                let name = entry["name"].as_str().unwrap().to_string();
+                let color = Scene::string_to_vec(entry["color"].as_str().unwrap());
+                textures.insert(name, Rc::new(SolidColor::new(color)));
+            }
+        }
+
         // MATERIAL PARSING
         // Materials hashmap. Keys will be used later to add materials to shapes.
         let mut materials: HashMap<String, Rc<dyn Material>> = HashMap::new();
@@ -202,9 +214,10 @@ impl Scene {
         if parsed_materials.has_key("metal") {
             for entry in parsed_materials["metal"].members() {
                 let name = entry["name"].as_str().unwrap().to_string();
-                let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
+                //let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
                 let fuzz = entry["fuzz"].as_f64().unwrap();
-                materials.insert(name, Rc::new(Metal { albedo, fuzz }));
+                let texture = entry["texture"].as_str().unwrap();
+                materials.insert(name, Rc::new(Metal { albedo: Rc::clone(&textures[texture]), fuzz }));
             }
         }
 
@@ -212,9 +225,10 @@ impl Scene {
         if parsed_materials.has_key("diffuse") {
             for entry in parsed_materials["diffuse"].members() {
                 let name = entry["name"].as_str().unwrap().to_string();
-                let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
+                // let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
                 let absorbance = entry["absorbance"].as_f64().unwrap();
-                materials.insert(name, Rc::new(Diffuse { albedo, absorbance }));
+                let texture = entry["texture"].as_str().unwrap();
+                materials.insert(name, Rc::new(Diffuse::new(Rc::clone(&textures[texture]), absorbance)));
             }
         }
 

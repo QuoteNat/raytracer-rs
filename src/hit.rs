@@ -56,10 +56,7 @@ impl Hittable for HittableList {
         let mut temp_rec = HitRecord {
             p: zero_vec(),
             normal: zero_vec(),
-            material: Rc::new(Diffuse {
-                albedo: zero_vec(),
-                absorbance: 0.5,
-            }),
+            material: Rc::new(Diffuse::new_from_color(zero_vec(), 0.5)),
             t: t_max,
             front_face: true,
             uv: TextureCoord::new(0.0, 0.0),

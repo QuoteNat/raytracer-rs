@@ -1,5 +1,6 @@
 use crate::lights::Light;
 use crate::scene::Scene;
+use crate::texture::{Texture, SolidColor};
 
 use super::hit::*;
 use super::ray::Ray;
@@ -10,8 +11,24 @@ pub trait Material {
 }
 
 pub struct Metal {
-    pub albedo: Color,
+    pub albedo: Rc<dyn Texture>,
     pub fuzz: f64,
+}
+
+impl Metal {
+    pub fn new(albedo: Rc<dyn Texture>, fuzz: f64) -> Metal {
+        Metal {
+            albedo: Rc::clone(&albedo),
+            fuzz
+        }
+    }
+
+    pub fn new_from_color(color: Color, fuzz: f64) -> Metal {
+        Metal {
+            albedo: Rc::new(SolidColor::new(color)),
+            fuzz
+        }
+    }
 }
 
 impl Material for Metal {
@@ -22,20 +39,30 @@ impl Material for Metal {
             direction: reflected + self.fuzz * random_in_unit_sphere(),
         };
 
-        return self.albedo * scene.ray_color(&scattered, depth);
+        return self.albedo.value(&rec.uv, &rec.p) * scene.ray_color(&scattered, depth);
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Diffuse {
-    pub albedo: Color,
-    pub absorbance: f64,
+    albedo: Rc<dyn Texture>,
+    absorbance: f64,
+}
+
+impl Diffuse {
+    pub fn new(albedo: Rc<dyn Texture>, absorbance: f64) -> Diffuse {
+        Diffuse { albedo: Rc::clone(&albedo), absorbance }
+    }
+
+    pub fn new_from_color(color: Color, absorbance: f64) -> Diffuse {
+        Diffuse { albedo: Rc::new(SolidColor::new(color)), absorbance }
+    }
 }
 
 impl Material for Diffuse {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         // lambertian light contribution
-        let cr = self.albedo * scene.lights.apply(r_in, rec, scene).contribution;
+        let cr = self.albedo.value(&rec.uv, &rec.p) * scene.lights.apply(r_in, rec, scene).contribution;
 
         let mut scatter_direction = rec.normal + random_unit_vector();
 
@@ -52,7 +79,7 @@ impl Material for Diffuse {
         let scattered_color = scene.ray_color(&scattered, depth);
 
         return vec_clamp(
-            cr * self.absorbance + (1.0 - self.absorbance) * self.albedo * scattered_color,
+            cr * self.absorbance + (1.0 - self.absorbance) * self.albedo.value(&rec.uv, &rec.p) * scattered_color,
             0.0,
             1.0,
         );

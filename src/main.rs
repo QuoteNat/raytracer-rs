@@ -8,7 +8,6 @@ mod lights;
 mod materials;
 mod ray;
 mod scene;
-mod scenes;
 mod shapes;
 mod utility;
 mod vector;
