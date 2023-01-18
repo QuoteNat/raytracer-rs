@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-
-
 mod aabb;
 mod buffer;
 mod bvh;
@@ -14,6 +12,7 @@ mod scenes;
 mod shapes;
 mod utility;
 mod vector;
+mod texture;
 
 use std::env;
 
