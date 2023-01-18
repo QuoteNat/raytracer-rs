@@ -12,6 +12,7 @@ mod shapes;
 mod utility;
 mod vector;
 mod texture;
+mod background;
 
 use std::env;
 
