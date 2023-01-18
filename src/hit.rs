@@ -1,6 +1,7 @@
 use super::materials::Material;
 use super::ray::Ray;
 use crate::aabb::AABB;
+use crate::texture::TextureCoord;
 use crate::{materials::Diffuse, vector::*};
 pub use std::rc::Rc;
 
@@ -11,8 +12,7 @@ pub struct HitRecord {
     pub material: Rc<dyn Material>,
     pub t: f64,
     pub front_face: bool,
-    pub u: f64,
-    pub v: f64,
+    pub uv: TextureCoord,
 }
 
 impl HitRecord {
@@ -62,6 +62,7 @@ impl Hittable for HittableList {
             }),
             t: t_max,
             front_face: true,
+            uv: TextureCoord::new(0.0, 0.0),
         };
         let mut hit_anything = false;
         let mut closest_so_far = t_max;

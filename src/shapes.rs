@@ -1,6 +1,9 @@
+use std::f64::consts::PI;
+
 use crate::aabb::AABB;
 use crate::hit::*;
 use crate::materials::Material;
+use crate::texture::TextureCoord;
 use crate::vector::*;
 use crate::Ray;
 
@@ -8,6 +11,16 @@ pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
     pub material: Rc<dyn Material>,
+}
+
+impl Sphere {
+    /// Returns the texture coordinates for a normalized point on the unit sphere
+    fn get_sphere_uv(p: &Point3) -> TextureCoord {
+        let theta = f64::acos(-p.y());
+        let phi = f64::atan2(-p.z(), p.x()) + PI;
+
+        TextureCoord { u: phi / (2.0*PI), v: theta / PI }
+    }
 }
 
 impl Hittable for Sphere {
@@ -46,6 +59,7 @@ impl Hittable for Sphere {
             normal,
             material,
             front_face: true,
+            uv: Sphere::get_sphere_uv(&normal),
         };
 
         rec.set_face_normal(r, &normal);
@@ -109,6 +123,7 @@ impl Hittable for Triangle {
         if dot(&n, &c) < 0.0 {
             return None;
         }
+        let gamma = dot(&n, &c);
 
         // edge 2
         let edge2 = self.point3 - self.point2;
@@ -117,6 +132,8 @@ impl Hittable for Triangle {
         if dot(&n, &c) < 0.0 {
             return None;
         }
+        let beta = dot(&n, &c);
+
 
         // edge 3 (due to how barycentric coordinates work, checking the third coordinate should be unnessecary. Check this later.)
         let edge3 = self.point1 - self.point3;
@@ -133,6 +150,7 @@ impl Hittable for Triangle {
             material: Rc::clone(&self.material),
             t,
             front_face: true,
+            uv: TextureCoord::new(gamma, beta),
         };
 
         rec.set_face_normal(r, &n);
