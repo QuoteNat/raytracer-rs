@@ -13,6 +13,7 @@ mod utility;
 mod vector;
 mod texture;
 mod background;
+mod perlin;
 
 use std::env;
 use std::time::Instant;
