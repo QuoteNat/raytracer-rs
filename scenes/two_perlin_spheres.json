@@ -1,0 +1,47 @@
+{
+    "camera": {
+        "type": "perspective",
+        "lookfrom": "13.0 2.0 3.0",
+        "lookat": "0.0 0.0 0.0",
+        "vup": "0.0 1.0 0.0",
+        "vfov": 40.0,
+        "width": 400,
+        "height": 400,
+        "samples": 10,
+        "max_depth": 10
+    },
+    "background": {
+        "type": "gradientY",
+        "color1": "1.0 1.0 1.0",
+        "color2": "0.5 0.7 1.0"
+    },     
+    "textures": [
+        {
+            "type": "noise",
+            "name": "pertext"
+        }
+    ],
+    "materials": {
+        "diffuse": [
+            {
+                "name": "diffuseTextureMaterial",
+                "absorbance": 0.2,
+                "texture": "pertext"
+            }
+        ]
+    },
+    "objects": {
+        "sphere": [
+            {
+                "center": "0.0 -1000.0 0.0",
+                "radius": 1000.0,
+                "material": "diffuseTextureMaterial"
+            },
+            {
+                "center": "0.0 2.0 0.0",
+                "radius": 2.0,
+                "material": "diffuseTextureMaterial"
+            }
+        ]
+    }
+}
