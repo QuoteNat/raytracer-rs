@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::vector::{Point3, Color};
+use crate::{vector::{Point3, Color}, perlin::Perlin};
 
 pub trait Texture {
     /// Returns the color at a given texture coordinate u, v
@@ -65,5 +65,22 @@ impl Texture for Checker {
         } else {
             return self.even.value(uv, p);
         }
+    }
+}
+
+struct NoiseTexture {
+    pub noise: Perlin,
+}
+
+impl NoiseTexture {
+    pub fn new() -> Perlin {
+        Perlin::new()
+    }
+}
+
+impl Texture for NoiseTexture {
+    #[allow(unused_variables)]
+    fn value(&self, uv: &TextureCoord, p: &Point3) -> Color {
+        return Color::new(1.0, 1.0, 1.0) * self.noise.noise(p);
     }
 }

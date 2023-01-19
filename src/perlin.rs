@@ -1,6 +1,6 @@
 use crate::{utility::{random_float_1, random_int}, vector::Point3};
 
-struct Perlin {
+pub struct Perlin {
     point_count: usize,
     ranfloat: Vec<f64>,
     perm_x: Vec<usize>,
