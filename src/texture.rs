@@ -68,13 +68,15 @@ impl Texture for Checker {
     }
 }
 
-struct NoiseTexture {
+pub struct NoiseTexture {
     pub noise: Perlin,
 }
 
 impl NoiseTexture {
-    pub fn new() -> Perlin {
-        Perlin::new()
+    pub fn new() -> NoiseTexture {
+        NoiseTexture {
+            noise: Perlin::new()
+        }
     }
 }
 
