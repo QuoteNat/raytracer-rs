@@ -15,6 +15,7 @@ mod texture;
 mod background;
 
 use std::env;
+use std::time::Instant;
 
 use hit::*;
 use ray::Ray;
@@ -27,8 +28,10 @@ fn main() {
 
     // Render
     //println!("P3\n{} {}\n255\n", image_width, image_height);
-
+    let start = Instant::now();
     scene.render();
+    let elapsed_time = start.elapsed().as_secs_f64();
+    println!("Render time was {} s", elapsed_time);
 
     // Make it so progress indicator doesn't end up before terminal prompt
     eprintln!("\nDone")

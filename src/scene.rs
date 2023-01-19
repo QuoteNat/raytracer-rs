@@ -345,7 +345,7 @@ impl Scene {
                 );
             }
         }
-
+        println!();
         buffer.buffer_to_png(String::from("image.png"));
     }
 }
