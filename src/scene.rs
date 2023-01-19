@@ -8,6 +8,7 @@ use json;
 
 use crate::background::{Background, GradientY, BackgroundColor};
 use crate::buffer::Buffer;
+use crate::bvh::BVHNode;
 use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
 use crate::lights::{LightList, PointLight};
@@ -28,6 +29,7 @@ pub struct Scene {
     samples: i32,
     max_depth: i32,
     background: Box<dyn Background>,
+    bvh_root: BVHNode,
 }
 
 impl Scene {
@@ -41,6 +43,7 @@ impl Scene {
         max_depth: i32,
         background: Box<dyn Background>,
     ) -> Scene {
+        let bvh_root = BVHNode::new(&objects.objects, 0);
         Scene {
             camera,
             objects,
@@ -49,7 +52,8 @@ impl Scene {
             height,
             samples,
             max_depth,
-            background
+            background,
+            bvh_root,
         }
     }
 
@@ -65,7 +69,7 @@ impl Scene {
             return zero_vec();
         }
 
-        match self.objects.hit(r, 0.001, INFINITY) {
+        match self.bvh_root.hit(r, 0.001, INFINITY) {
             Some(rec) => {
                 return rec.material.apply(r, &rec, &self, depth);
             }
@@ -77,7 +81,7 @@ impl Scene {
 
     #[allow(unused_variables)]
     pub fn any_hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
-        match self.objects.hit(r, 0.001, INFINITY) {
+        match self.bvh_root.hit(r, 0.001, INFINITY) {
             Some(_) => return true,
             None => return false,
         }
@@ -301,8 +305,10 @@ impl Scene {
         }
 
         eprintln!("{} lights", lights.len());
+        eprintln!("{} textures", textures.len());
         eprintln!("{} materials", materials.len());
         eprintln!("{} objects", objects.len());
+        let bvh_root = BVHNode::new(&objects.objects, 0);
         // eprintln!("{}")
         Scene {
             camera,
@@ -312,7 +318,8 @@ impl Scene {
             height,
             samples,
             max_depth,
-            background
+            background,
+            bvh_root
         }
     }
 
@@ -336,7 +343,6 @@ impl Scene {
                     i as u32,
                     j as u32,
                 );
-                //write_color(pixel_color, samples_per_pixel);
             }
         }
 

@@ -45,6 +45,10 @@ impl Vec3 {
     pub fn err_write(&self) {
         eprintln!("({}, {}, {})", self.e[0], self.e[1], self.e[2]);
     }
+
+    pub fn to_string(&self) -> String {
+        format!("({}, {}, {})", self.e[0], self.e[1], self.e[2])
+    }
 }
 
 /// Negation. Equivalent to -1 * vector

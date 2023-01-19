@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// BVH Node struct, for creating a bounding volume hierarchy
-struct BVHNode {
+pub struct BVHNode {
     left: Rc<dyn Hittable>,
     right: Rc<dyn Hittable>,
     aabb: AABB,
@@ -33,6 +33,7 @@ impl BVHNode {
             false => return Ordering::Greater,
         }
     }
+
     pub fn new(src_objects: &Vec<Rc<dyn Hittable>>, axis: u32) -> BVHNode {
         let mut objects = src_objects.clone();
         objects.sort_by(|a, b| BVHNode::box_compare(a, b, axis));
@@ -70,17 +71,17 @@ impl BVHNode {
 
 impl Hittable for BVHNode {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        if self.aabb.hit(r, t_min, t_max) {
+        if !self.aabb.hit(r, t_min, t_max) {
             return None;
         }
 
         let hit_left = self.left.hit(r, t_min, t_max);
 
         // TODO: Find a cleaner solution for this
-        if !hit_left.is_none() {
+        if hit_left.is_some() {
             let hit_left = hit_left.unwrap();
             let hit_right = self.right.hit(r, t_min, hit_left.t);
-            if !hit_right.is_none() {
+            if hit_right.is_some() {
                 let hit_right = hit_right.unwrap();
                 if hit_right.t < hit_left.t {
                     return Some(hit_right);
