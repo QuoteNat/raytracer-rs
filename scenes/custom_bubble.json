@@ -7,8 +7,43 @@
         "vfov": 90.0,
         "width": 400,
         "height": 400,
-        "samples": 100,
+        "samples": 200,
         "max_depth": 10
+    },
+    "background": {
+        "type": "backgroundColor",
+        "color": "0.0 0.0 0.0"
+    },
+    "textures": {
+        "color": [
+            {
+                "name": "white",
+                "color": "1.0 1.0 1.0"
+            },
+            {
+                "name": "right",
+                "color": "0.8 0.6 0.2"
+            },
+            {
+                "name": "triangle",
+                "color": "1.0 0.5 0.5"
+            },
+            {
+                "name": "pink",
+                "color": "1.0 0.0 1.0"
+            },
+            {
+                "name": "black",
+                "color": "0.0 0.0 0.0"
+            }
+        ],
+        "checker": [
+            {
+                "name": "missing",
+                "odd": "pink",
+                "even": "black"
+            }
+        ]
     },
     "lights": {
         "pointLight": [
@@ -50,19 +85,19 @@
         "metal": [
             {
                 "name": "right",
-                "albedo": "0.8 0.6 0.2",
+                "texture": "right",
                 "fuzz": 0.0
             },
             {
                 "name": "triangle",
-                "albedo": "1.0 0.5 0.5",
+                "texture": "triangle",
                 "fuzz": 0.0
             }
         ],
         "diffuse": [
             {
                 "name": "front",
-                "albedo": "1.0 1.0 1.0",
+                "texture": "missing",
                 "absorbance": 0.5
             }
         ]
