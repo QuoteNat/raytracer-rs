@@ -14,37 +14,39 @@
         "type": "backgroundColor",
         "color": "0.0 0.0 0.0"
     },
-    "textures": {
-        "color": [
-            {
-                "name": "white",
-                "color": "1.0 1.0 1.0"
-            },
-            {
-                "name": "right",
-                "color": "0.8 0.6 0.2"
-            },
-            {
-                "name": "triangle",
-                "color": "1.0 0.5 0.5"
-            },
-            {
-                "name": "pink",
-                "color": "1.0 0.0 1.0"
-            },
-            {
-                "name": "black",
-                "color": "0.0 0.0 0.0"
-            }
-        ],
-        "checker": [
-            {
-                "name": "missing",
-                "odd": "pink",
-                "even": "black"
-            }
-        ]
-    },
+    "textures": [
+        {
+            "type": "color",
+            "name": "white",
+            "color": "1.0 1.0 1.0"
+        },
+        {
+            "type": "color",
+            "name": "right",
+            "color": "0.8 0.6 0.2"
+        },
+        {
+            "type": "color",
+            "name": "triangle",
+            "color": "1.0 0.5 0.5"
+        },
+        {
+            "type": "color",
+            "name": "pink",
+            "color": "1.0 0.0 1.0"
+        },
+        {
+            "type": "color",
+            "name": "black",
+            "color": "0.0 0.0 0.0"
+        },
+        {
+            "type": "checker",
+            "name": "missing",
+            "odd": "pink",
+            "even": "black"
+        }
+    ],
     "lights": {
         "pointLight": [
             {
