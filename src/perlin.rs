@@ -13,8 +13,8 @@ impl Perlin {
         let point_count = 256;
         let mut ranfloat: Vec<f64> = Vec::new();
 
-        for i in 0..point_count {
-            ranfloat[i] = random_float_1();
+        for _ in 0..point_count {
+            ranfloat.push(random_float_1());
         }
 
         let perm_x = Perlin::perlin_generate_perm(point_count);
@@ -42,7 +42,7 @@ impl Perlin {
         let mut p: Vec<usize> = Vec::new();
 
         for i in 0..point_count {
-            p[i] = i as usize;
+            p.push(i);
         }
 
         Perlin::permute(&mut p, point_count);

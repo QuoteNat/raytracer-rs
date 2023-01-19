@@ -13,7 +13,6 @@ use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
 use crate::lights::{LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
-use crate::perlin::Perlin;
 use crate::ray::Ray;
 use crate::shapes::{Sphere, Triangle};
 use crate::texture::{Texture, SolidColor, Checker, NoiseTexture};
