@@ -205,7 +205,8 @@ impl Scene {
                     }
                     "noise" => {
                         let name = entry["name"].as_str().unwrap().to_string();
-                        textures.insert(name, Rc::new(NoiseTexture::new()));
+                        let scale = entry["scale"].as_f64().unwrap();
+                        textures.insert(name, Rc::new(NoiseTexture::new(scale)));
                     }
                     _ => {}
                 }
