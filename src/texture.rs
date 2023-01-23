@@ -1,6 +1,9 @@
 use std::rc::Rc;
 
-use crate::{vector::{Point3, Color}, perlin::Perlin};
+use crate::{
+    perlin::Perlin,
+    vector::{Color, Point3},
+};
 
 pub trait Texture {
     /// Returns the color at a given texture coordinate u, v
@@ -52,7 +55,10 @@ impl Checker {
 
     /// Creates a new Checker texture from two colors
     pub fn new_from_colors(odd: Color, even: Color) -> Checker {
-        Checker { odd: Rc::new(SolidColor::new(odd)), even: Rc::new(SolidColor::new(even)) }
+        Checker {
+            odd: Rc::new(SolidColor::new(odd)),
+            even: Rc::new(SolidColor::new(even)),
+        }
     }
 }
 
@@ -75,7 +81,7 @@ pub struct NoiseTexture {
 impl NoiseTexture {
     pub fn new() -> NoiseTexture {
         NoiseTexture {
-            noise: Perlin::new()
+            noise: Perlin::new(),
         }
     }
 }

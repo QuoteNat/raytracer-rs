@@ -1,19 +1,19 @@
 #![allow(dead_code)]
 mod aabb;
+mod background;
 mod buffer;
 mod bvh;
 mod camera;
 mod hit;
 mod lights;
 mod materials;
+mod perlin;
 mod ray;
 mod scene;
 mod shapes;
+mod texture;
 mod utility;
 mod vector;
-mod texture;
-mod background;
-mod perlin;
 
 use std::env;
 use std::time::Instant;

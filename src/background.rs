@@ -1,4 +1,4 @@
-use crate::vector::{Vec3, Color, unit_vector};
+use crate::vector::{unit_vector, Color, Vec3};
 
 pub trait Background {
     /// Returns the background color for a given ray direction
@@ -7,7 +7,7 @@ pub trait Background {
 
 /// A background that is always a single consistent color
 pub struct BackgroundColor {
-    color: Color
+    color: Color,
 }
 
 impl BackgroundColor {
@@ -38,6 +38,6 @@ impl Background for GradientY {
     fn apply(&self, dir: Vec3) -> Color {
         let unit_direction = unit_vector(dir);
         let t = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0-t) * self.color1 + t * self.color2;
+        return (1.0 - t) * self.color1 + t * self.color2;
     }
 }

@@ -1,6 +1,6 @@
 use crate::lights::Light;
 use crate::scene::Scene;
-use crate::texture::{Texture, SolidColor};
+use crate::texture::{SolidColor, Texture};
 
 use super::hit::*;
 use super::ray::Ray;
@@ -19,14 +19,14 @@ impl Metal {
     pub fn new(albedo: Rc<dyn Texture>, fuzz: f64) -> Metal {
         Metal {
             albedo: Rc::clone(&albedo),
-            fuzz
+            fuzz,
         }
     }
 
     pub fn new_from_color(color: Color, fuzz: f64) -> Metal {
         Metal {
             albedo: Rc::new(SolidColor::new(color)),
-            fuzz
+            fuzz,
         }
     }
 }
@@ -51,18 +51,25 @@ pub struct Diffuse {
 
 impl Diffuse {
     pub fn new(albedo: Rc<dyn Texture>, absorbance: f64) -> Diffuse {
-        Diffuse { albedo: Rc::clone(&albedo), absorbance }
+        Diffuse {
+            albedo: Rc::clone(&albedo),
+            absorbance,
+        }
     }
 
     pub fn new_from_color(color: Color, absorbance: f64) -> Diffuse {
-        Diffuse { albedo: Rc::new(SolidColor::new(color)), absorbance }
+        Diffuse {
+            albedo: Rc::new(SolidColor::new(color)),
+            absorbance,
+        }
     }
 }
 
 impl Material for Diffuse {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         // lambertian light contribution
-        let cr = self.albedo.value(&rec.uv, &rec.p) * scene.lights.apply(r_in, rec, scene).contribution;
+        let cr =
+            self.albedo.value(&rec.uv, &rec.p) * scene.lights.apply(r_in, rec, scene).contribution;
 
         let mut scatter_direction = rec.normal + random_unit_vector();
 
@@ -79,7 +86,8 @@ impl Material for Diffuse {
         let scattered_color = scene.ray_color(&scattered, depth);
 
         return vec_clamp(
-            cr * self.absorbance + (1.0 - self.absorbance) * self.albedo.value(&rec.uv, &rec.p) * scattered_color,
+            cr * self.absorbance
+                + (1.0 - self.absorbance) * self.albedo.value(&rec.uv, &rec.p) * scattered_color,
             0.0,
             1.0,
         );

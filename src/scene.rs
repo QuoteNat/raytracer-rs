@@ -6,19 +6,19 @@ use std::rc::Rc;
 
 use json;
 
-use crate::background::{Background, GradientY, BackgroundColor};
+use crate::background::{Background, BackgroundColor, GradientY};
 use crate::buffer::Buffer;
 use crate::bvh::BVHNode;
+use crate::camera::Camera;
 use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
 use crate::lights::{LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::shapes::{Sphere, Triangle};
-use crate::texture::{Texture, SolidColor, Checker, NoiseTexture};
+use crate::texture::{Checker, NoiseTexture, SolidColor, Texture};
 use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
-use crate::camera::Camera;
 
 pub struct Scene {
     camera: Box<dyn Camera>,
@@ -159,7 +159,6 @@ impl Scene {
             }
         };
 
-        
         let background_parsed = &parsed["background"];
         let background_type = background_parsed["type"].as_str().unwrap();
         let background: Box<dyn Background> = match background_type {
@@ -172,7 +171,7 @@ impl Scene {
                 let color = Scene::string_to_vec(background_parsed["color"].as_str().unwrap());
                 Box::new(BackgroundColor::new(color))
             }
-            _ => {Box::new(BackgroundColor::new(zero_vec()))}
+            _ => Box::new(BackgroundColor::new(zero_vec())),
         };
 
         // LIGHT PARSING
@@ -200,12 +199,13 @@ impl Scene {
                     "checker" => {
                         let name = entry["name"].as_str().unwrap().to_string();
                         let odd = Rc::clone(&textures[&entry["odd"].as_str().unwrap().to_string()]);
-                        let even = Rc::clone(&textures[&entry["even"].as_str().unwrap().to_string()]);
-                        textures.insert(name, Rc::new(Checker::new_from_textures(&odd, &even)));                        
+                        let even =
+                            Rc::clone(&textures[&entry["even"].as_str().unwrap().to_string()]);
+                        textures.insert(name, Rc::new(Checker::new_from_textures(&odd, &even)));
                     }
                     "noise" => {
                         let name = entry["name"].as_str().unwrap().to_string();
-                        textures.insert(name, Rc::new(NoiseTexture::new()));                        
+                        textures.insert(name, Rc::new(NoiseTexture::new()));
                     }
                     _ => {}
                 }
@@ -272,7 +272,13 @@ impl Scene {
                 //let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
                 let fuzz = entry["fuzz"].as_f64().unwrap();
                 let texture = entry["texture"].as_str().unwrap();
-                materials.insert(name, Rc::new(Metal { albedo: Rc::clone(&textures[texture]), fuzz }));
+                materials.insert(
+                    name,
+                    Rc::new(Metal {
+                        albedo: Rc::clone(&textures[texture]),
+                        fuzz,
+                    }),
+                );
             }
         }
 
@@ -283,7 +289,10 @@ impl Scene {
                 // let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
                 let absorbance = entry["absorbance"].as_f64().unwrap();
                 let texture = entry["texture"].as_str().unwrap();
-                materials.insert(name, Rc::new(Diffuse::new(Rc::clone(&textures[texture]), absorbance)));
+                materials.insert(
+                    name,
+                    Rc::new(Diffuse::new(Rc::clone(&textures[texture]), absorbance)),
+                );
             }
         }
 
@@ -341,7 +350,7 @@ impl Scene {
             samples,
             max_depth,
             background,
-            bvh_root
+            bvh_root,
         }
     }
 

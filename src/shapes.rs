@@ -19,7 +19,10 @@ impl Sphere {
         let theta = f64::acos(-p.y());
         let phi = f64::atan2(-p.z(), p.x()) + PI;
 
-        TextureCoord { u: phi / (2.0*PI), v: theta / PI }
+        TextureCoord {
+            u: phi / (2.0 * PI),
+            v: theta / PI,
+        }
     }
 }
 
@@ -133,7 +136,6 @@ impl Hittable for Triangle {
             return None;
         }
         let beta = dot(&n, &c);
-
 
         // edge 3 (due to how barycentric coordinates work, checking the third coordinate should be unnessecary. Check this later.)
         let edge3 = self.point1 - self.point3;

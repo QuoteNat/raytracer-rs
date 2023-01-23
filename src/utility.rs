@@ -25,7 +25,7 @@ pub fn random_float_1() -> f64 {
 
 pub fn random_int(min: i32, max: i32) -> i32 {
     let mut rng = thread_rng();
-    return rng.gen_range(min..max+1);
+    return rng.gen_range(min..max + 1);
 }
 
 pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
