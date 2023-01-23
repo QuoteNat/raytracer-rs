@@ -1,5 +1,5 @@
 use crate::{
-    utility::{random_float, random_float_1, random_int},
+    utility::random_int,
     vector::{dot, random_vec, unit_vector, zero_vec, Point3, Vec3},
 };
 
@@ -32,6 +32,20 @@ impl Perlin {
             perm_z,
             ranvec,
         }
+    }
+
+    pub fn turb(&self, p: &Point3, depth: i32) -> f64 {
+        let mut accum = 0.0;
+        let mut temp_p = *p;
+        let mut weight = 1.0;
+
+        for _ in 0..depth {
+            accum += weight * self.noise(&temp_p);
+            weight *= 0.5;
+            temp_p *= 2.0;
+        }
+
+        return f64::abs(accum);
     }
 
     pub fn noise(&self, p: &Point3) -> f64 {
