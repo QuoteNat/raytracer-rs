@@ -7,7 +7,7 @@
         "vfov": 40.0,
         "width": 400,
         "height": 400,
-        "samples": 10,
+        "samples": 100,
         "max_depth": 10
     },
     "background": {
