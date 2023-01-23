@@ -93,7 +93,7 @@ impl AddAssign for Vec3 {
 impl MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, other: f64) {
         *self = Self {
-            e: [self.x() + other, self.y() + other, self.z() + other],
+            e: [self.x() * other, self.y() * other, self.z() * other],
         };
     }
 }
