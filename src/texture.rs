@@ -91,6 +91,6 @@ impl NoiseTexture {
 impl Texture for NoiseTexture {
     #[allow(unused_variables)]
     fn value(&self, uv: &TextureCoord, p: &Point3) -> Color {
-        return Color::new(1.0, 1.0, 1.0) * self.noise.noise(&(self.scale * *p));
+        return Color::new(1.0, 1.0, 1.0) * 0.5 * (1.0 + self.noise.noise(&(self.scale * *p)));
     }
 }
