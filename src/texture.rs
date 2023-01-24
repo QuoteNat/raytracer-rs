@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
+    buffer::Buffer,
     perlin::Perlin,
     vector::{Color, Point3},
 };
@@ -94,5 +95,35 @@ impl Texture for NoiseTexture {
         return Color::new(1.0, 1.0, 1.0)
             * 0.5
             * (1.0 + f64::sin(self.scale * p.z() + 10.0 * self.noise.turb(p, 7)));
+    }
+}
+
+pub struct ImageTexture {
+    buffer: Buffer,
+    width: u32,
+    height: u32,
+}
+
+impl ImageTexture {
+    /// Create a new ImageTexture from a PNG image
+    pub fn new(path: String) -> ImageTexture {
+        let buffer = Buffer::new_from_png(path);
+        let width = buffer.width();
+        let height = buffer.height();
+
+        ImageTexture {
+            buffer,
+            width,
+            height,
+        }
+    }
+}
+
+impl Texture for ImageTexture {
+    fn value(&self, uv: &TextureCoord, p: &Point3) -> Color {
+        let x = (uv.u * self.width as f64) as u32;
+        let y = (uv.v * self.height as f64) as u32;
+
+        self.buffer.at(x, y)
     }
 }

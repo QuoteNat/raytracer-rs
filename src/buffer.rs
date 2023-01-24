@@ -65,6 +65,16 @@ impl Buffer {
         return self.e[index];
     }
 
+    /// Returns buffer width
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    /// Returns buffer height
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
     /// Outputs the buffer to a png file
     pub fn buffer_to_png(&self, path: String) {
         let path = Path::new(&path);
