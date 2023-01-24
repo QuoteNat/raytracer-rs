@@ -1,5 +1,5 @@
 use crate::utility::clamp;
-use crate::vector::{zero_vec, Color};
+use crate::vector::{zero_vec, Color, Vec3};
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
@@ -21,6 +21,31 @@ impl Buffer {
         }
     }
 
+    pub fn new_from_png(path: String) -> Buffer {
+        // read in the png file
+        let decoder = png::Decoder::new(File::open(path).unwrap());
+        let mut reader = decoder.read_info().unwrap();
+        let mut buf = vec![0; reader.output_buffer_size()];
+        let info = reader.next_frame(&mut buf).unwrap();
+        let bytes = &buf[..info.buffer_size()];
+        // fetch the width and height
+        let header = reader.info();
+        let width = header.width;
+        let height = header.height;
+        // allocate the Color buffer
+        let mut e = vec![Vec3::new(0.0, 0.0, 0.0); (width * height) as usize];
+
+        for i in (0..reader.output_buffer_size()).step_by(3) {
+            e.push(Vec3::new(
+                bytes[i] as f64,
+                bytes[i + 1] as f64,
+                bytes[i + 2] as f64,
+            ))
+        }
+
+        Buffer { e, width, height }
+    }
+
     /// Returns the 1d array index of [r(ow), c(olumn)]
     fn index(&self, r: u32, c: u32) -> usize {
         return ((self.height - r - 1) * self.width + c) as usize;
@@ -34,13 +59,11 @@ impl Buffer {
     }
 
     /// Returns value at [x, y]
-    // pub fn at(&self, x: u32, y: u32) -> Color {
-    //     let index = self.index(y, x);
+    pub fn at(&self, x: u32, y: u32) -> Color {
+        let index = self.index(y, x);
 
-    //     Color {
-    //         e: [self.e[index], self.e[index + 1], self.e[index + 2]],
-    //     }
-    // }
+        return self.e[index];
+    }
 
     /// Outputs the buffer to a png file
     pub fn buffer_to_png(&self, path: String) {
