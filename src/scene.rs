@@ -16,7 +16,7 @@ use crate::lights::{LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::shapes::{Sphere, Triangle};
-use crate::texture::{Checker, NoiseTexture, SolidColor, Texture};
+use crate::texture::{Checker, ImageTexture, NoiseTexture, SolidColor, Texture};
 use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
 
@@ -207,6 +207,11 @@ impl Scene {
                         let name = entry["name"].as_str().unwrap().to_string();
                         let scale = entry["scale"].as_f64().unwrap();
                         textures.insert(name, Rc::new(NoiseTexture::new(scale)));
+                    }
+                    "image" => {
+                        let name = entry["name"].as_str().unwrap().to_string();
+                        let path = entry["path"].as_str().unwrap().to_string();
+                        textures.insert(name, Rc::new(ImageTexture::new(path)));
                     }
                     _ => {}
                 }

@@ -32,18 +32,23 @@ impl Buffer {
         let header = reader.info();
         let width = header.width;
         let height = header.height;
+
         // allocate the Color buffer
-        let mut e = vec![Vec3::new(0.0, 0.0, 0.0); (width * height) as usize];
+        let mut buffer = Buffer {
+            e: Vec::new(),
+            width,
+            height,
+        };
 
         for i in (0..reader.output_buffer_size()).step_by(3) {
-            e.push(Vec3::new(
-                bytes[i] as f64,
-                bytes[i + 1] as f64,
-                bytes[i + 2] as f64,
+            buffer.e.push(Vec3::new(
+                bytes[i] as f64 / 256.0,
+                bytes[i + 1] as f64 / 256.0,
+                bytes[i + 2] as f64 / 256.0,
             ))
         }
 
-        Buffer { e, width, height }
+        return buffer;
     }
 
     /// Returns the 1d array index of [r(ow), c(olumn)]
