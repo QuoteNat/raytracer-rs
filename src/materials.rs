@@ -85,12 +85,8 @@ impl Material for Diffuse {
 
         let scattered_color = scene.ray_color(&scattered, depth);
 
-        return vec_clamp(
-            cr * self.absorbance
-                + (1.0 - self.absorbance) * self.albedo.value(&rec.uv, &rec.p) * scattered_color,
-            0.0,
-            1.0,
-        );
+        return cr * self.absorbance
+            + (1.0 - self.absorbance) * self.albedo.value(&rec.uv, &rec.p) * scattered_color;
     }
 }
 

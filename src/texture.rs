@@ -120,7 +120,7 @@ impl ImageTexture {
 }
 
 impl Texture for ImageTexture {
-    fn value(&self, uv: &TextureCoord, p: &Point3) -> Color {
+    fn value(&self, uv: &TextureCoord, _p: &Point3) -> Color {
         let x = (uv.u * self.width as f64) as u32;
         let y = (uv.v * self.height as f64) as u32;
 

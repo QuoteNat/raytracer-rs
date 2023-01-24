@@ -13,9 +13,9 @@ use crate::camera::Camera;
 use crate::camera::PerspectiveCamera;
 use crate::hit::{Hittable, HittableList};
 use crate::lights::{LightList, PointLight};
-use crate::materials::{BlinnPhong, Dielectric, Diffuse, Lambertian, Material, Metal};
+use crate::materials::{BlinnPhong, Dielectric, Diffuse, Emissive, Lambertian, Material, Metal};
 use crate::ray::Ray;
-use crate::shapes::{Sphere, Triangle};
+use crate::shapes::{Sphere, Triangle, XYRect};
 use crate::texture::{Checker, ImageTexture, NoiseTexture, SolidColor, Texture};
 use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
@@ -160,7 +160,10 @@ impl Scene {
         };
 
         let background_parsed = &parsed["background"];
-        let background_type = background_parsed["type"].as_str().unwrap();
+        let background_type = match background_parsed["type"].as_str() {
+            Some(string) => string,
+            None => "",
+        };
         let background: Box<dyn Background> = match background_type {
             "gradientY" => {
                 let color1 = Scene::string_to_vec(background_parsed["color1"].as_str().unwrap());
@@ -171,6 +174,7 @@ impl Scene {
                 let color = Scene::string_to_vec(background_parsed["color"].as_str().unwrap());
                 Box::new(BackgroundColor::new(color))
             }
+            "" => Box::new(BackgroundColor::new(zero_vec())),
             _ => Box::new(BackgroundColor::new(zero_vec())),
         };
 
@@ -302,6 +306,15 @@ impl Scene {
             }
         }
 
+        // Prase emissive materials
+        if parsed_materials.has_key("emissive") {
+            for entry in parsed_materials["emissive"].members() {
+                let name = entry["name"].as_str().unwrap().to_string();
+                let texture = entry["texture"].as_str().unwrap();
+                materials.insert(name, Rc::new(Emissive::new(&textures[texture])));
+            }
+        }
+
         // SHAPE PARSING
         let mut objects = HittableList {
             objects: Vec::new(),
@@ -338,6 +351,22 @@ impl Scene {
                 };
 
                 objects.add(Rc::new(sphere));
+            }
+        }
+
+        // XYRect
+        if parsed_objects.has_key("xyrect") {
+            for entry in parsed_objects["xyrect"].members() {
+                let x0 = entry["x0"].as_f64().unwrap();
+                let x1 = entry["x1"].as_f64().unwrap();
+                let y0 = entry["y0"].as_f64().unwrap();
+                let y1 = entry["y1"].as_f64().unwrap();
+                let k = entry["z"].as_f64().unwrap();
+                let material = entry["material"].as_str().unwrap().to_string();
+                let material = &Rc::clone(&materials[&material]);
+                let rect = XYRect::new(x0, x1, y0, y1, k, material);
+
+                objects.add(Rc::new(rect));
             }
         }
 
