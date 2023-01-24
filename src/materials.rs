@@ -211,3 +211,23 @@ impl Material for BlinnPhong {
         return vec_clamp(l_r, 0.0, 1.0);
     }
 }
+
+pub struct Emissive {
+    emit: Rc<dyn Texture>,
+}
+
+impl Emissive {
+    /// Creates a new Emissive material from a texture
+    pub fn new(texture: &Rc<dyn Texture>) -> Emissive {
+        Emissive {
+            emit: Rc::clone(texture),
+        }
+    }
+}
+
+impl Material for Emissive {
+    #[allow(unused_variables)]
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
+        self.emit.value(&rec.uv, &rec.p)
+    }
+}
