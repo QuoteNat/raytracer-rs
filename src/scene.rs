@@ -486,7 +486,7 @@ impl Scene {
             let mut threads = Vec::new();
             for i in (0..num_threads).rev() {
                 threads.push(scope.spawn(move |_| {
-                    println!("Started thread {}", i);
+                    println!("Started thread {}", i + 1);
                     let mut thread_buffer = Vec::new();
                     let start = div * i as i32;
                     // Clamp to prevent overflows from the final thread
@@ -495,6 +495,7 @@ impl Scene {
                         end = self.height;
                     }
                     for j in (start..end).rev() {
+                        println!("Thread {}: lines remaining={}", i + 1, j - start);
                         for i in 0..self.width {
                             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                             for _ in 0..self.samples {
@@ -507,7 +508,7 @@ impl Scene {
                             thread_buffer.push(pixel_color / (self.samples as f64));
                         }
                     }
-                    println!("Finished thread {}", i);
+                    println!("Finished thread {}", i + 1);
                     thread_buffer
                 }));
             }
