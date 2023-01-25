@@ -11,6 +11,7 @@ pub trait Texture: Sync + Send {
     fn value(&self, uv: &TextureCoord, p: &Point3) -> Color;
 }
 
+#[derive(Clone)]
 pub struct TextureCoord {
     pub u: f64,
     pub v: f64,

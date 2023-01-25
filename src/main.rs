@@ -5,6 +5,7 @@ mod buffer;
 mod bvh;
 mod camera;
 mod hit;
+mod instance;
 mod lights;
 mod materials;
 mod perlin;

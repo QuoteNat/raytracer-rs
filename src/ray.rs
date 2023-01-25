@@ -6,6 +6,9 @@ pub struct Ray {
 }
 
 impl Ray {
+    pub fn new(origin: Point3, direction: Vec3) -> Ray {
+        Ray { origin, direction }
+    }
     /// Return position of ray at time t
     pub fn at(&self, t: f64) -> Point3 {
         self.origin + t * self.direction

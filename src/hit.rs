@@ -7,6 +7,7 @@ use crate::texture::TextureCoord;
 use crate::{materials::Diffuse, vector::*};
 
 /// Hit record class
+#[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
