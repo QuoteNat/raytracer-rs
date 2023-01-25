@@ -7,16 +7,8 @@
         "vfov": 40.0,
         "width": 600,
         "height": 600,
-        "samples": 10,
+        "samples": 100,
         "max_depth": 10
-    },
-    "lights": {
-        "pointLight": [
-            {
-                "position": "225 225 225",
-                "color": "1.0 1.0 1.0"
-            }
-        ]
     },
     "textures": [
         {
@@ -44,17 +36,17 @@
         "diffuse": [
             {
                 "name": "red",
-                "absorbance": 0.5,
+                "absorbance": 0.0,
                 "texture": "red"
             },
             {
                 "name": "white",
-                "absorbance": 0.5,
+                "absorbance": 0.0,
                 "texture": "white"
             },
             {
                 "name": "green",
-                "absorbance": 0.5,
+                "absorbance": 0.0,
                 "texture": "green"
             }
         ],

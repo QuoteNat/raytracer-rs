@@ -18,7 +18,7 @@ use crate::hit::{Hittable, HittableList};
 use crate::lights::{LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Emissive, Lambertian, Material, Metal};
 use crate::ray::Ray;
-use crate::shapes::{Sphere, Triangle, XYRect};
+use crate::shapes::{Sphere, Triangle, XYRect, XZRect, YZRect};
 use crate::texture::{Checker, ImageTexture, NoiseTexture, SolidColor, Texture};
 use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
@@ -372,6 +372,36 @@ impl Scene {
                 let material = entry["material"].as_str().unwrap().to_string();
                 let material = &Arc::clone(&materials[&material]);
                 let rect = XYRect::new(x0, x1, y0, y1, k, material);
+
+                objects.add(Arc::new(rect));
+            }
+        }
+        // XYRect
+        if parsed_objects.has_key("xzrect") {
+            for entry in parsed_objects["xzrect"].members() {
+                let x0 = entry["x0"].as_f64().unwrap();
+                let x1 = entry["x1"].as_f64().unwrap();
+                let z0 = entry["z0"].as_f64().unwrap();
+                let z1 = entry["z1"].as_f64().unwrap();
+                let k = entry["y"].as_f64().unwrap();
+                let material = entry["material"].as_str().unwrap().to_string();
+                let material = &Arc::clone(&materials[&material]);
+                let rect = XZRect::new(x0, x1, z0, z1, k, material);
+
+                objects.add(Arc::new(rect));
+            }
+        }
+        // XYRect
+        if parsed_objects.has_key("yzrect") {
+            for entry in parsed_objects["yzrect"].members() {
+                let y0 = entry["y0"].as_f64().unwrap();
+                let y1 = entry["y1"].as_f64().unwrap();
+                let z0 = entry["z0"].as_f64().unwrap();
+                let z1 = entry["z1"].as_f64().unwrap();
+                let k = entry["x"].as_f64().unwrap();
+                let material = entry["material"].as_str().unwrap().to_string();
+                let material = &Arc::clone(&materials[&material]);
+                let rect = YZRect::new(y0, y1, z0, z1, k, material);
 
                 objects.add(Arc::new(rect));
             }
