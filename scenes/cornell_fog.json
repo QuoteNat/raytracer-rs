@@ -7,7 +7,7 @@
         "vfov": 40.0,
         "width": 600,
         "height": 600,
-        "samples": 200,
+        "samples": 500,
         "max_depth": 10
     },
     "textures": [

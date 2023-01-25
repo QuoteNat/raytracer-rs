@@ -69,8 +69,8 @@ impl Hittable for ConstantMedium {
     }
 
     fn hit(&self, r: &crate::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        let enableDebug = false;
-        let debugging = enableDebug && random_float_1() < 0.00001;
+        let enable_debug = false;
+        let debugging = enable_debug && random_float_1() < 0.00001;
 
         let mut rec1 = match self.boundary.hit(r, -f64::INFINITY, f64::INFINITY) {
             Some(rec) => rec,
@@ -103,12 +103,12 @@ impl Hittable for ConstantMedium {
         }
 
         if rec1.t < 0.0 {
-            rec1.t = 0.0
+            rec1.t = 0.0;
         }
 
         let ray_length = r.direction.length();
         let distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
-        let hit_distance = self.neg_inv_density * f64::log10(random_float_1());
+        let hit_distance = self.neg_inv_density * f64::ln(random_float_1());
 
         if hit_distance > distance_inside_boundary {
             return None;
