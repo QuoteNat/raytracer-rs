@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use json::object::Object;
-
 use crate::background::BackgroundColor;
 
 use crate::bvh::BVHNode;
