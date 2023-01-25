@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
+use json::object::Object;
+
 use crate::background::BackgroundColor;
 
+use crate::bvh::BVHNode;
 use crate::camera::PerspectiveCamera;
 
 use crate::hit::*;
@@ -338,10 +341,16 @@ impl Scene {
             )))
         }
 
+        let boxes2 = BVHNode::new(&boxes2.objects, 0);
+
         objects.add(Arc::new(Translate::new(
             Arc::new(RotateY::new(Arc::new(boxes2), 15.0)),
             Vec3::new(-100.0, 270.0, 395.0),
         )));
+        // objects.add(Arc::new(Translate::new(
+        //     Arc::new(boxes2),
+        //     Vec3::new(-100.0, 270.0, 395.0),
+        // )));
 
         let camera = Arc::new(PerspectiveCamera::new(
             Vec3::new(478.0, 278.0, -600.0),
@@ -358,7 +367,7 @@ impl Scene {
             Arc::new(LightList::new()),
             800,
             800,
-            1,
+            5,
             10,
             Arc::new(BackgroundColor::new(Color::new(0.0, 0.0, 0.0))),
         )

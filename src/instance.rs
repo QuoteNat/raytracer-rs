@@ -79,7 +79,7 @@ impl RotateY {
 
                     for c in 0..3 {
                         min[c] = f64::min(min[c], tester[c]);
-                        max[c] = f64::min(min[c], tester[c]);
+                        max[c] = f64::max(min[c], tester[c]);
                     }
                 }
             }
