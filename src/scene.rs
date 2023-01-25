@@ -404,7 +404,7 @@ impl Scene {
 
         crossbeam::scope(|scope| {
             let mut threads = Vec::new();
-            for i in 0..num_threads {
+            for i in (0..num_threads).rev() {
                 threads.push(scope.spawn(move |_| {
                     println!("Started thread {}", i);
                     let mut thread_buffer = Vec::new();
@@ -414,7 +414,7 @@ impl Scene {
                     if i == num_threads - 1 && end != self.height {
                         end = self.height;
                     }
-                    for j in start..end {
+                    for j in (start..end).rev() {
                         for i in 0..self.width {
                             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                             for _ in 0..self.samples {
