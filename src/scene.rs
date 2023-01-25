@@ -399,7 +399,7 @@ impl Scene {
     pub fn render(&self) {
         let mut buffer = Buffer::new(self.width as u32, self.height as u32);
         let num_threads = num_cpus::get() - 1;
-        let div = self.height as usize / num_threads;
+        let div = self.height / num_threads as i32;
         //let channels: Vec<(Sender<_>, Receiver<Vec<Color>>)> = vec![mpsc::channel(); num_threads]
 
         crossbeam::scope(|scope| {
@@ -407,14 +407,16 @@ impl Scene {
             for i in 0..num_threads {
                 threads.push(scope.spawn(move |_| {
                     println!("Started thread {}", i);
-                    let mut thread_buffer =
-                        vec![Vec3::new(0.0, 0.0, 0.0); div * self.width as usize];
-                    let start = div * i;
+                    let mut thread_buffer = Vec::new();
+                    let start = div * i as i32;
                     // Clamp to prevent overflows from the final thread
-                    let end = (div * i + div).clamp(0, (self.width * self.height - 1) as usize);
-                    for j in (start..end).rev() {
+                    let mut end = (div * i as i32 + div).clamp(0, self.width * self.height);
+                    if i == num_threads - 1 && end != self.height {
+                        end = self.height;
+                    }
+                    for j in start..end {
                         for i in 0..self.width {
-                            let mut pixel_color = Color { e: [0.0, 0.0, 0.0] };
+                            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                             for _ in 0..self.samples {
                                 let u = (i as f64 + random_float_1()) / (self.width + 1) as f64;
                                 let v = (j as f64 + random_float_1()) / (self.height - 1) as f64;
@@ -433,7 +435,6 @@ impl Scene {
             let mut count = 0;
             for thread in threads {
                 let chunk = thread.join().unwrap();
-                println!("Chunk length={}", chunk.len());
                 for pixel in chunk {
                     buffer.write_index(pixel, count);
                     count += 1;
