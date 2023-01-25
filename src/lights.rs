@@ -60,8 +60,8 @@ pub struct PointLight {
 
 impl Light for PointLight {
     /// Returns light contribution based off of lambert's law in the form of a Color
-    #[allow(unused_variables)]
-    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> LightDetails {
+
+    fn apply(&self, _r_in: &Ray, rec: &HitRecord, scene: &Scene) -> LightDetails {
         let n = rec.normal;
         let l = unit_vector(self.position - rec.p);
 

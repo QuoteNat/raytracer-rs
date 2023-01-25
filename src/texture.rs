@@ -35,8 +35,7 @@ impl SolidColor {
 }
 
 impl Texture for SolidColor {
-    #[allow(unused_variables)]
-    fn value(&self, uv: &TextureCoord, p: &Point3) -> Color {
+    fn value(&self, _uv: &TextureCoord, _p: &Point3) -> Color {
         self.color
     }
 }
@@ -91,8 +90,7 @@ impl NoiseTexture {
 }
 
 impl Texture for NoiseTexture {
-    #[allow(unused_variables)]
-    fn value(&self, uv: &TextureCoord, p: &Point3) -> Color {
+    fn value(&self, _uv: &TextureCoord, p: &Point3) -> Color {
         return Color::new(1.0, 1.0, 1.0)
             * 0.5
             * (1.0 + f64::sin(self.scale * p.z() + 10.0 * self.noise.turb(p, 7)));

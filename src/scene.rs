@@ -81,8 +81,7 @@ impl Scene {
         return self.background.apply(r.direction);
     }
 
-    #[allow(unused_variables)]
-    pub fn any_hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
+    pub fn any_hit(&self, r: &Ray, _t_min: f64, _t_max: f64) -> bool {
         match self.bvh_root.hit(r, 0.001, INFINITY) {
             Some(_) => return true,
             None => return false,

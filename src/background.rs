@@ -17,8 +17,7 @@ impl BackgroundColor {
 }
 
 impl Background for BackgroundColor {
-    #[allow(unused_variables)]
-    fn apply(&self, dir: Vec3) -> Color {
+    fn apply(&self, _dir: Vec3) -> Color {
         self.color
     }
 }

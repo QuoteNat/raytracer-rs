@@ -167,8 +167,7 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    #[allow(unused_variables)]
-    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, _depth: i32) -> Color {
         // lambertian light contribution
         let cr = self.albedo * scene.lights.apply(r_in, rec, scene).contribution;
         vec_clamp(cr, 0.0, 1.0)
@@ -192,8 +191,7 @@ impl BlinnPhong {
 }
 
 impl Material for BlinnPhong {
-    #[allow(unused_variables)]
-    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
+    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, _depth: i32) -> Color {
         let mut l_r = zero_vec();
         for light in &scene.lights.lights {
             let detail = light.as_ref().apply(r_in, rec, scene);
@@ -224,8 +222,7 @@ impl Emissive {
 }
 
 impl Material for Emissive {
-    #[allow(unused_variables)]
-    fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
+    fn apply(&self, _r_in: &Ray, rec: &HitRecord, _scene: &Scene, _depth: i32) -> Color {
         self.emit.value(&rec.uv, &rec.p)
     }
 }
