@@ -1,12 +1,10 @@
-use core::num;
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{self, Read, Write};
+use std::io::Read;
 use std::path::Path;
-use std::sync::mpsc::Sender;
+
 use std::sync::Arc;
 
-use crossbeam::channel::Receiver;
 use json::{self, JsonValue};
 
 use crate::background::{Background, BackgroundColor, GradientY};

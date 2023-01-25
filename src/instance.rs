@@ -1,4 +1,4 @@
-use std::{f64::INFINITY, fs::DirEntry, sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     aabb::AABB,
