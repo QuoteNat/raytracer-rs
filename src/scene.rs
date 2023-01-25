@@ -21,6 +21,7 @@ use crate::shapes::{self, Sphere, Triangle, XYRect, XZRect, YZRect};
 use crate::texture::{Checker, ImageTexture, NoiseTexture, SolidColor, Texture};
 use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
+use crate::volumes::ConstantMedium;
 
 pub struct Scene {
     camera: Arc<dyn Camera>,
@@ -106,7 +107,11 @@ impl Scene {
         )
     }
 
-    fn shape_transform(entry: &JsonValue, shape: Arc<dyn Hittable>) -> Arc<dyn Hittable> {
+    fn modifiers(
+        entry: &JsonValue,
+        shape: Arc<dyn Hittable>,
+        textures: &HashMap<String, Arc<dyn Texture>>,
+    ) -> Arc<dyn Hittable> {
         let mut transform_shape = shape;
         if entry.has_key("rotate_y") {
             let angle = entry["rotate_y"].as_f64().unwrap();
@@ -116,6 +121,19 @@ impl Scene {
         if entry.has_key("translate") {
             let translate = Scene::string_to_vec(entry["translate"].as_str().unwrap());
             transform_shape = Arc::new(Translate::new(transform_shape, translate));
+        }
+
+        if entry.has_key("volume") {
+            let details = &entry["volume"];
+            let texture_name = details["texture"].as_str().unwrap().to_string();
+            let d = details["d"].as_f64().unwrap();
+            let absorbance = details["absorbance"].as_f64().unwrap();
+            transform_shape = Arc::new(ConstantMedium::new(
+                &transform_shape,
+                d,
+                &textures[&texture_name],
+                absorbance,
+            ));
         }
 
         transform_shape
@@ -354,7 +372,7 @@ impl Scene {
                     material: Arc::clone(&materials[&material]),
                 };
 
-                objects.add(Scene::shape_transform(entry, Arc::new(triangle)));
+                objects.add(Scene::modifiers(entry, Arc::new(triangle), &textures));
             }
         }
 
@@ -370,7 +388,7 @@ impl Scene {
                     material: Arc::clone(&materials[&material]),
                 };
 
-                objects.add(Scene::shape_transform(entry, Arc::new(sphere)));
+                objects.add(Scene::modifiers(entry, Arc::new(sphere), &textures));
             }
         }
 
@@ -386,7 +404,7 @@ impl Scene {
                 let material = &Arc::clone(&materials[&material]);
                 let rect = XYRect::new(x0, x1, y0, y1, k, material);
 
-                objects.add(Scene::shape_transform(entry, Arc::new(rect)));
+                objects.add(Scene::modifiers(entry, Arc::new(rect), &textures));
             }
         }
         // XYRect
@@ -401,7 +419,7 @@ impl Scene {
                 let material = &Arc::clone(&materials[&material]);
                 let rect = XZRect::new(x0, x1, z0, z1, k, material);
 
-                objects.add(Scene::shape_transform(entry, Arc::new(rect)));
+                objects.add(Scene::modifiers(entry, Arc::new(rect), &textures));
             }
         }
         // XYRect
@@ -416,7 +434,7 @@ impl Scene {
                 let material = &Arc::clone(&materials[&material]);
                 let rect = YZRect::new(y0, y1, z0, z1, k, material);
 
-                objects.add(Scene::shape_transform(entry, Arc::new(rect)));
+                objects.add(Scene::modifiers(entry, Arc::new(rect), &textures));
             }
         }
 
@@ -428,7 +446,7 @@ impl Scene {
                 let material = Arc::clone(&materials[&material]);
                 let s_box = shapes::Box::new(&min, &max, material);
 
-                objects.add(Scene::shape_transform(entry, Arc::new(s_box)));
+                objects.add(Scene::modifiers(entry, Arc::new(s_box), &textures));
             }
         }
 
