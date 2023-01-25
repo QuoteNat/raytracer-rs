@@ -29,8 +29,8 @@ impl Hittable for Translate {
         AABB::new(aabb.min() + self.offset, aabb.max() + self.offset)
     }
 
-    fn hit(&self, r: &crate::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        let moved = Ray::new(r.origin + self.offset, r.direction);
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let moved = Ray::new(r.origin - self.offset, r.direction);
 
         match self.ptr.hit(&moved, t_min, t_max) {
             Some(rec) => {

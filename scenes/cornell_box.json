@@ -115,7 +115,7 @@
         "box": [
             {
                 "min": "0 0 0",
-                "max": "265 330 165",
+                "max": "165 330 165",
                 "translate": "265 0 295",
                 "rotate_y": 15,
                 "material": "white"
