@@ -15,6 +15,7 @@ mod shapes;
 mod texture;
 mod utility;
 mod vector;
+mod volumes;
 
 use std::env;
 use std::time::Instant;
