@@ -160,6 +160,13 @@ impl Scene {
             Ok(parsed) => parsed,
         };
 
+        if parsed.has_key("scene") {
+            match parsed["scene"].as_str().unwrap() {
+                "rt:tnw_final" => return Scene::gen_final_scene(),
+                _ => return Scene::gen_final_scene(),
+            }
+        }
+
         // CAMERA PARSING
         let width;
         let height;

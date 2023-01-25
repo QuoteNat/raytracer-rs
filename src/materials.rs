@@ -98,6 +98,12 @@ pub struct Dielectric {
     pub ir: f64,
 }
 
+impl Dielectric {
+    pub fn new(ir: f64) -> Dielectric {
+        Dielectric { ir }
+    }
+}
+
 impl Material for Dielectric {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color {
         // Let refraction ratio equal 1/ir if outside the object, or ir if inside the object

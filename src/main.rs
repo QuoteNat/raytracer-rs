@@ -11,6 +11,7 @@ mod materials;
 mod perlin;
 mod ray;
 mod scene;
+mod scenes;
 mod shapes;
 mod texture;
 mod utility;

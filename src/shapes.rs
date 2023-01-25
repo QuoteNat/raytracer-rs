@@ -15,6 +15,13 @@ pub struct Sphere {
 }
 
 impl Sphere {
+    pub fn new(center: Point3, radius: f64, material: &Arc<dyn Material>) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material: Arc::clone(material),
+        }
+    }
     /// Returns the texture coordinates for a normalized point on the unit sphere
     fn get_sphere_uv(p: &Point3) -> TextureCoord {
         let theta = f64::acos(-p.y());
