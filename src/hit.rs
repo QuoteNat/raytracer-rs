@@ -41,6 +41,11 @@ pub struct HittableList {
 }
 
 impl HittableList {
+    pub fn new() -> HittableList {
+        HittableList {
+            objects: Vec::new(),
+        }
+    }
     /// Add a Hittable object to the HittableList
     pub fn add(&mut self, object: Arc<dyn Hittable>) {
         self.objects.push(object);

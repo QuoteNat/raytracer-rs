@@ -342,3 +342,79 @@ impl Hittable for YZRect {
         return Some(rec);
     }
 }
+
+pub struct Box {
+    min: Point3,
+    max: Point3,
+    sides: HittableList,
+}
+
+impl Box {
+    pub fn new(min: &Point3, max: &Point3, material: Arc<dyn Material>) -> Box {
+        let mut sides = HittableList::new();
+        let min = *min;
+        let max = *max;
+        sides.add(Arc::new(XYRect::new(
+            min.x(),
+            max.x(),
+            min.y(),
+            max.y(),
+            max.z(),
+            &Arc::clone(&material),
+        )));
+        sides.add(Arc::new(XYRect::new(
+            min.x(),
+            max.x(),
+            min.y(),
+            max.y(),
+            min.z(),
+            &Arc::clone(&material),
+        )));
+
+        sides.add(Arc::new(XZRect::new(
+            min.x(),
+            max.x(),
+            min.z(),
+            max.z(),
+            max.y(),
+            &Arc::clone(&material),
+        )));
+        sides.add(Arc::new(XZRect::new(
+            min.x(),
+            max.x(),
+            min.z(),
+            max.z(),
+            min.y(),
+            &Arc::clone(&material),
+        )));
+
+        sides.add(Arc::new(YZRect::new(
+            min.y(),
+            max.y(),
+            min.z(),
+            max.z(),
+            max.x(),
+            &Arc::clone(&material),
+        )));
+        sides.add(Arc::new(YZRect::new(
+            min.y(),
+            max.y(),
+            min.z(),
+            max.z(),
+            min.x(),
+            &Arc::clone(&material),
+        )));
+
+        Box { min, max, sides }
+    }
+}
+
+impl Hittable for Box {
+    fn bounding_box(&self) -> AABB {
+        return AABB::new(self.min, self.max);
+    }
+
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        return self.sides.hit(r, t_min, t_max);
+    }
+}

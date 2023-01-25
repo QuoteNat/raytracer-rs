@@ -111,6 +111,18 @@
                 "x": 0,
                 "material": "red"
             }
+        ],
+        "box": [
+            {
+                "min": "130 0 65",
+                "max": "295 165 230",
+                "material": "white"
+            },
+            {
+                "min": "265 0 295",
+                "max": "430 330 460",
+                "material": "white"
+            }
         ]
     }
 }

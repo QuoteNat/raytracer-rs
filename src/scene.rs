@@ -18,7 +18,7 @@ use crate::hit::{Hittable, HittableList};
 use crate::lights::{LightList, PointLight};
 use crate::materials::{BlinnPhong, Dielectric, Diffuse, Emissive, Lambertian, Material, Metal};
 use crate::ray::Ray;
-use crate::shapes::{Sphere, Triangle, XYRect, XZRect, YZRect};
+use crate::shapes::{self, Sphere, Triangle, XYRect, XZRect, YZRect};
 use crate::texture::{Checker, ImageTexture, NoiseTexture, SolidColor, Texture};
 use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
@@ -404,6 +404,18 @@ impl Scene {
                 let rect = YZRect::new(y0, y1, z0, z1, k, material);
 
                 objects.add(Arc::new(rect));
+            }
+        }
+
+        if parsed_objects.has_key("box") {
+            for entry in parsed_objects["box"].members() {
+                let min = Scene::string_to_vec(entry["min"].as_str().unwrap());
+                let max = Scene::string_to_vec(entry["max"].as_str().unwrap());
+                let material = entry["material"].as_str().unwrap().to_string();
+                let material = Arc::clone(&materials[&material]);
+                let s_box = shapes::Box::new(&min, &max, material);
+
+                objects.add(Arc::new(s_box));
             }
         }
 
