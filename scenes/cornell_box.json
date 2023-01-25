@@ -1,0 +1,124 @@
+{
+    "camera": {
+        "type": "perspective",
+        "lookfrom": "278 278 -800",
+        "lookat": "278 278 0",
+        "vup": "0.0 1.0 0.0",
+        "vfov": 40.0,
+        "width": 600,
+        "height": 600,
+        "samples": 10,
+        "max_depth": 10
+    },
+    "lights": {
+        "pointLight": [
+            {
+                "position": "225 225 225",
+                "color": "1.0 1.0 1.0"
+            }
+        ]
+    },
+    "textures": [
+        {
+            "type": "color",
+            "name": "red",
+            "color": ".65 .05 .05"
+        },
+        {
+            "type": "color",
+            "name": "white",
+            "color": ".73 .73 .73"
+        },
+        {
+            "type": "color",
+            "name": "green",
+            "color": ".12 .45 .15"
+        },
+        {
+            "type": "color",
+            "name": "light",
+            "color": "15 15 15"
+        }
+    ],
+    "materials": {
+        "diffuse": [
+            {
+                "name": "red",
+                "absorbance": 0.5,
+                "texture": "red"
+            },
+            {
+                "name": "white",
+                "absorbance": 0.5,
+                "texture": "white"
+            },
+            {
+                "name": "green",
+                "absorbance": 0.5,
+                "texture": "green"
+            }
+        ],
+        "emissive": [
+            {
+                "name": "light",
+                "texture": "light"
+            }
+        ]
+    },
+    "objects": {
+        "xyrect": [
+            {
+                "x0": 0,
+                "x1": 555,
+                "y0": 0,
+                "y1": 555,
+                "z": 555,
+                "material": "white"
+            }
+        ],
+        "xzrect": [
+            {
+                "x0": 213,
+                "x1": 343,
+                "z0": 227,
+                "z1": 332,
+                "y": 554,
+                "material": "light"
+            },
+            {
+                "x0": 0,
+                "x1": 555,
+                "z0": 0,
+                "z1": 555,
+                "y": 0,
+                "material": "white"
+            },
+            {
+                "x0": 0,
+                "x1": 555,
+                "z0": 0,
+                "z1": 555,
+                "y": 555,
+                "material": "white"
+            }
+        ],
+        "yzrect": [
+            {
+                "y0": 0,
+                "y1": 555,
+                "z0": 0,
+                "z1": 555,
+                "x": 555,
+                "material": "green"
+            },
+            {
+                "y0": 0,
+                "y1": 555,
+                "z0": 0,
+                "z1": 555,
+                "x": 0,
+                "material": "red"
+            }
+        ]
+    }
+}
