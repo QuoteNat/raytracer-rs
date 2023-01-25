@@ -1,4 +1,5 @@
 use std::f64::consts::PI;
+use std::sync::Arc;
 
 use crate::aabb::AABB;
 use crate::hit::*;
@@ -10,7 +11,7 @@ use crate::Ray;
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
-    pub material: Rc<dyn Material>,
+    pub material: Arc<dyn Material>,
 }
 
 impl Sphere {
@@ -54,7 +55,7 @@ impl Hittable for Sphere {
         let t = root;
         let p = r.at(t);
         let normal = (p - self.center) / self.radius;
-        let material = Rc::clone(&self.material);
+        let material = Arc::clone(&self.material);
 
         let mut rec = HitRecord {
             t,
@@ -82,7 +83,7 @@ pub struct Triangle {
     pub point1: Point3,
     pub point2: Point3,
     pub point3: Point3,
-    pub material: Rc<dyn Material>,
+    pub material: Arc<dyn Material>,
 }
 
 impl Hittable for Triangle {
@@ -149,7 +150,7 @@ impl Hittable for Triangle {
         let mut rec = HitRecord {
             p,
             normal: n,
-            material: Rc::clone(&self.material),
+            material: Arc::clone(&self.material),
             t,
             front_face: true,
             uv: TextureCoord::new(gamma, beta),
@@ -166,7 +167,7 @@ impl Hittable for Triangle {
 }
 
 pub struct XYRect {
-    material: Rc<dyn Material>,
+    material: Arc<dyn Material>,
     x0: f64,
     x1: f64,
     y0: f64,
@@ -175,9 +176,9 @@ pub struct XYRect {
 }
 
 impl XYRect {
-    pub fn new(x0: f64, x1: f64, y0: f64, y1: f64, k: f64, material: &Rc<dyn Material>) -> XYRect {
+    pub fn new(x0: f64, x1: f64, y0: f64, y1: f64, k: f64, material: &Arc<dyn Material>) -> XYRect {
         XYRect {
-            material: Rc::clone(material),
+            material: Arc::clone(material),
             x0,
             x1,
             y0,
@@ -209,7 +210,7 @@ impl Hittable for XYRect {
         let mut rec = HitRecord {
             p: r.at(t),
             normal: Vec3::new(0.0, 0.0, 1.0),
-            material: Rc::clone(&self.material),
+            material: Arc::clone(&self.material),
             t,
             front_face: true,
             uv: TextureCoord::new(

@@ -1,8 +1,9 @@
+use std::sync::Arc;
+
 use crate::scene::Scene;
 use crate::vector::{dot, unit_vector, vec_clamp, zero_vec, Color, Point3, Vec3};
 use crate::HitRecord;
 use crate::Ray;
-use std::rc::Rc;
 
 pub struct LightDetails {
     pub contribution: Color,
@@ -10,13 +11,13 @@ pub struct LightDetails {
 }
 
 /// Abstract Light trait.
-pub trait Light {
+pub trait Light: Sync + Send {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene) -> LightDetails;
 }
 
 /// List of lights in a scene
 pub struct LightList {
-    pub lights: Vec<Rc<dyn Light>>,
+    pub lights: Vec<Arc<dyn Light>>,
 }
 
 impl LightList {
@@ -26,7 +27,7 @@ impl LightList {
     }
 
     /// Adds a light to the light list
-    pub fn add(&mut self, object: Rc<dyn Light>) {
+    pub fn add(&mut self, object: Arc<dyn Light>) {
         self.lights.push(object);
     }
 

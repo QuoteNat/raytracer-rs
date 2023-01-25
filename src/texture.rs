@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::{
     buffer::Buffer,
@@ -6,7 +6,7 @@ use crate::{
     vector::{Color, Point3},
 };
 
-pub trait Texture {
+pub trait Texture: Sync + Send {
     /// Returns the color at a given texture coordinate u, v
     fn value(&self, uv: &TextureCoord, p: &Point3) -> Color;
 }
@@ -41,24 +41,24 @@ impl Texture for SolidColor {
 }
 
 pub struct Checker {
-    odd: Rc<dyn Texture>,
-    even: Rc<dyn Texture>,
+    odd: Arc<dyn Texture>,
+    even: Arc<dyn Texture>,
 }
 
 impl Checker {
     /// Creates a new Checker texture from two texture pointers
-    pub fn new_from_textures(odd: &Rc<dyn Texture>, even: &Rc<dyn Texture>) -> Checker {
+    pub fn new_from_textures(odd: &Arc<dyn Texture>, even: &Arc<dyn Texture>) -> Checker {
         Checker {
-            odd: Rc::clone(odd),
-            even: Rc::clone(even),
+            odd: Arc::clone(odd),
+            even: Arc::clone(even),
         }
     }
 
     /// Creates a new Checker texture from two colors
     pub fn new_from_colors(odd: Color, even: Color) -> Checker {
         Checker {
-            odd: Rc::new(SolidColor::new(odd)),
-            even: Rc::new(SolidColor::new(even)),
+            odd: Arc::new(SolidColor::new(odd)),
+            even: Arc::new(SolidColor::new(even)),
         }
     }
 }

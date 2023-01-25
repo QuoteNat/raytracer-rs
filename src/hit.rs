@@ -1,15 +1,16 @@
+use std::sync::Arc;
+
 use super::materials::Material;
 use super::ray::Ray;
 use crate::aabb::AABB;
 use crate::texture::TextureCoord;
 use crate::{materials::Diffuse, vector::*};
-pub use std::rc::Rc;
 
 /// Hit record class
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub material: Rc<dyn Material>,
+    pub material: Arc<dyn Material>,
     pub t: f64,
     pub front_face: bool,
     pub uv: TextureCoord,
@@ -28,7 +29,7 @@ impl HitRecord {
 }
 
 /// An object that can be intersected by a ray
-pub trait Hittable {
+pub trait Hittable: Sync + Send {
     /// Implements ray intersect function for a given object
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 
@@ -36,12 +37,12 @@ pub trait Hittable {
 }
 
 pub struct HittableList {
-    pub objects: Vec<Rc<dyn Hittable>>,
+    pub objects: Vec<Arc<dyn Hittable>>,
 }
 
 impl HittableList {
     /// Add a Hittable object to the HittableList
-    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+    pub fn add(&mut self, object: Arc<dyn Hittable>) {
         self.objects.push(object);
     }
 
@@ -56,7 +57,7 @@ impl Hittable for HittableList {
         let mut temp_rec = HitRecord {
             p: zero_vec(),
             normal: zero_vec(),
-            material: Rc::new(Diffuse::new_from_color(zero_vec(), 0.5)),
+            material: Arc::new(Diffuse::new_from_color(zero_vec(), 0.5)),
             t: t_max,
             front_face: true,
             uv: TextureCoord::new(0.0, 0.0),
@@ -69,7 +70,7 @@ impl Hittable for HittableList {
                 Some(rec) => {
                     hit_anything = true;
                     closest_so_far = rec.t;
-                    temp_rec.material = Rc::clone(&rec.material);
+                    temp_rec.material = Arc::clone(&rec.material);
                     temp_rec.t = rec.t;
                     temp_rec.normal = rec.normal;
                     temp_rec.p = rec.p;

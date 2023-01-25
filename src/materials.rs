@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::lights::Light;
 use crate::scene::Scene;
 use crate::texture::{SolidColor, Texture};
@@ -6,26 +8,26 @@ use super::hit::*;
 use super::ray::Ray;
 use super::vector::*;
 
-pub trait Material {
+pub trait Material: Sync + Send {
     fn apply(&self, r_in: &Ray, rec: &HitRecord, scene: &Scene, depth: i32) -> Color;
 }
 
 pub struct Metal {
-    pub albedo: Rc<dyn Texture>,
+    pub albedo: Arc<dyn Texture>,
     pub fuzz: f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Rc<dyn Texture>, fuzz: f64) -> Metal {
+    pub fn new(albedo: Arc<dyn Texture>, fuzz: f64) -> Metal {
         Metal {
-            albedo: Rc::clone(&albedo),
+            albedo: Arc::clone(&albedo),
             fuzz,
         }
     }
 
     pub fn new_from_color(color: Color, fuzz: f64) -> Metal {
         Metal {
-            albedo: Rc::new(SolidColor::new(color)),
+            albedo: Arc::new(SolidColor::new(color)),
             fuzz,
         }
     }
@@ -45,21 +47,21 @@ impl Material for Metal {
 
 #[derive(Clone)]
 pub struct Diffuse {
-    albedo: Rc<dyn Texture>,
+    albedo: Arc<dyn Texture>,
     absorbance: f64,
 }
 
 impl Diffuse {
-    pub fn new(albedo: Rc<dyn Texture>, absorbance: f64) -> Diffuse {
+    pub fn new(albedo: Arc<dyn Texture>, absorbance: f64) -> Diffuse {
         Diffuse {
-            albedo: Rc::clone(&albedo),
+            albedo: Arc::clone(&albedo),
             absorbance,
         }
     }
 
     pub fn new_from_color(color: Color, absorbance: f64) -> Diffuse {
         Diffuse {
-            albedo: Rc::new(SolidColor::new(color)),
+            albedo: Arc::new(SolidColor::new(color)),
             absorbance,
         }
     }
@@ -209,14 +211,14 @@ impl Material for BlinnPhong {
 }
 
 pub struct Emissive {
-    emit: Rc<dyn Texture>,
+    emit: Arc<dyn Texture>,
 }
 
 impl Emissive {
     /// Creates a new Emissive material from a texture
-    pub fn new(texture: &Rc<dyn Texture>) -> Emissive {
+    pub fn new(texture: &Arc<dyn Texture>) -> Emissive {
         Emissive {
-            emit: Rc::clone(texture),
+            emit: Arc::clone(texture),
         }
     }
 }

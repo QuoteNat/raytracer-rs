@@ -3,7 +3,7 @@ use crate::utility::{degrees_to_radians, random_in_unit_disk};
 use crate::vector::*;
 
 /// Trait for a Camera class that generates rays for the scene
-pub trait Camera {
+pub trait Camera: Sync + Send {
     fn get_ray(&self, s: f64, t: f64) -> Ray;
 }
 

@@ -1,5 +1,4 @@
-use std::cmp::Ordering;
-use std::rc::Rc;
+use std::{cmp::Ordering, sync::Arc};
 
 use crate::{
     aabb::AABB,
@@ -9,14 +8,14 @@ use crate::{
 
 /// BVH Node struct, for creating a bounding volume hierarchy
 pub struct BVHNode {
-    left: Rc<dyn Hittable>,
-    right: Rc<dyn Hittable>,
+    left: Arc<dyn Hittable>,
+    right: Arc<dyn Hittable>,
     aabb: AABB,
 }
 
 impl BVHNode {
     /// Compares two boxes along an axis (0=x, 1=y, 2=z)
-    fn box_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>, axis: u32) -> Ordering {
+    fn box_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>, axis: u32) -> Ordering {
         let box_a = a.bounding_box();
         let box_b = b.bounding_box();
 
@@ -34,7 +33,7 @@ impl BVHNode {
         }
     }
 
-    pub fn new(src_objects: &Vec<Rc<dyn Hittable>>, axis: u32) -> BVHNode {
+    pub fn new(src_objects: &Vec<Arc<dyn Hittable>>, axis: u32) -> BVHNode {
         let mut objects = src_objects.clone();
         objects.sort_by(|a, b| BVHNode::box_compare(a, b, axis));
 
@@ -42,27 +41,27 @@ impl BVHNode {
 
         if length == 1 {
             BVHNode {
-                left: Rc::clone(&objects[0]),
-                right: Rc::clone(&objects[0]),
+                left: Arc::clone(&objects[0]),
+                right: Arc::clone(&objects[0]),
                 aabb: src_objects[0].bounding_box(),
             }
         } else if length == 2 {
             BVHNode {
-                left: Rc::clone(&objects[0]),
-                right: Rc::clone(&objects[1]),
+                left: Arc::clone(&objects[0]),
+                right: Arc::clone(&objects[1]),
                 aabb: AABB::surround(&objects[0].bounding_box(), &objects[1].bounding_box()),
             }
         } else {
             let mid = length / 2;
 
-            let left: Rc<dyn Hittable> =
-                Rc::new(BVHNode::new(&objects[0..mid].to_vec(), (axis + 1) % 3));
-            let right: Rc<dyn Hittable> =
-                Rc::new(BVHNode::new(&objects[mid..length].to_vec(), (axis + 1) % 3));
+            let left: Arc<dyn Hittable> =
+                Arc::new(BVHNode::new(&objects[0..mid].to_vec(), (axis + 1) % 3));
+            let right: Arc<dyn Hittable> =
+                Arc::new(BVHNode::new(&objects[mid..length].to_vec(), (axis + 1) % 3));
 
             BVHNode {
-                left: Rc::clone(&left),
-                right: Rc::clone(&right),
+                left: Arc::clone(&left),
+                right: Arc::clone(&right),
                 aabb: AABB::surround(&left.bounding_box(), &right.bounding_box()),
             }
         }

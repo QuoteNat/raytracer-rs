@@ -1,6 +1,6 @@
 use crate::vector::{unit_vector, Color, Vec3};
 
-pub trait Background {
+pub trait Background: Sync + Send {
     /// Returns the background color for a given ray direction
     fn apply(&self, dir: Vec3) -> Color;
 }

@@ -1,9 +1,12 @@
+use core::num;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::path::Path;
-use std::rc::Rc;
+use std::sync::mpsc::Sender;
+use std::sync::Arc;
 
+use crossbeam::channel::Receiver;
 use json;
 
 use crate::background::{Background, BackgroundColor, GradientY};
@@ -21,27 +24,27 @@ use crate::utility::{random_float_1, INFINITY};
 use crate::vector::{quick_vec, zero_vec, Color, Vec3};
 
 pub struct Scene {
-    camera: Box<dyn Camera>,
-    pub objects: Box<HittableList>,
-    pub lights: Box<LightList>,
+    camera: Arc<dyn Camera>,
+    pub objects: Arc<HittableList>,
+    pub lights: Arc<LightList>,
     width: i32,
     height: i32,
     samples: i32,
     max_depth: i32,
-    background: Box<dyn Background>,
+    background: Arc<dyn Background>,
     bvh_root: BVHNode,
 }
 
 impl Scene {
     pub fn new<'a>(
-        camera: Box<dyn Camera>,
-        objects: Box<HittableList>,
-        lights: Box<LightList>,
+        camera: Arc<dyn Camera>,
+        objects: Arc<HittableList>,
+        lights: Arc<LightList>,
         width: i32,
         height: i32,
         samples: i32,
         max_depth: i32,
-        background: Box<dyn Background>,
+        background: Arc<dyn Background>,
     ) -> Scene {
         let bvh_root = BVHNode::new(&objects.objects, 0);
         Scene {
@@ -131,7 +134,7 @@ impl Scene {
         let height;
         let samples;
         let max_depth;
-        let camera: Box<dyn Camera>;
+        let camera: Arc<dyn Camera>;
         let parsed_camera = &parsed["camera"];
         match parsed_camera["type"].as_str().unwrap() {
             "perspective" => {
@@ -146,7 +149,7 @@ impl Scene {
                 max_depth = parsed_camera["max_depth"].as_i32().unwrap();
                 let aspect_ratio = width as f64 / height as f64;
 
-                camera = Box::new(PerspectiveCamera::new(
+                camera = Arc::new(PerspectiveCamera::new(
                     lookfrom,
                     lookat,
                     vup,
@@ -164,18 +167,18 @@ impl Scene {
             Some(string) => string,
             None => "",
         };
-        let background: Box<dyn Background> = match background_type {
+        let background: Arc<dyn Background> = match background_type {
             "gradientY" => {
                 let color1 = Scene::string_to_vec(background_parsed["color1"].as_str().unwrap());
                 let color2 = Scene::string_to_vec(background_parsed["color2"].as_str().unwrap());
-                Box::new(GradientY::new(color1, color2))
+                Arc::new(GradientY::new(color1, color2))
             }
             "backgroundColor" => {
                 let color = Scene::string_to_vec(background_parsed["color"].as_str().unwrap());
-                Box::new(BackgroundColor::new(color))
+                Arc::new(BackgroundColor::new(color))
             }
-            "" => Box::new(BackgroundColor::new(zero_vec())),
-            _ => Box::new(BackgroundColor::new(zero_vec())),
+            "" => Arc::new(BackgroundColor::new(zero_vec())),
+            _ => Arc::new(BackgroundColor::new(zero_vec())),
         };
 
         // LIGHT PARSING
@@ -185,11 +188,11 @@ impl Scene {
             for entry in parsed_lights["pointLight"].members() {
                 let position = Scene::string_to_vec(entry["position"].as_str().unwrap());
                 let color = Scene::string_to_vec(entry["color"].as_str().unwrap());
-                lights.add(Rc::new(PointLight { position, color }));
+                lights.add(Arc::new(PointLight { position, color }));
             }
         }
 
-        let mut textures: HashMap<String, Rc<dyn Texture>> = HashMap::new();
+        let mut textures: HashMap<String, Arc<dyn Texture>> = HashMap::new();
         let parsed_textures = &parsed["textures"];
 
         if parsed.has_key("textures") {
@@ -198,24 +201,25 @@ impl Scene {
                     "color" => {
                         let name = entry["name"].as_str().unwrap().to_string();
                         let color = Scene::string_to_vec(entry["color"].as_str().unwrap());
-                        textures.insert(name, Rc::new(SolidColor::new(color)));
+                        textures.insert(name, Arc::new(SolidColor::new(color)));
                     }
                     "checker" => {
                         let name = entry["name"].as_str().unwrap().to_string();
-                        let odd = Rc::clone(&textures[&entry["odd"].as_str().unwrap().to_string()]);
+                        let odd =
+                            Arc::clone(&textures[&entry["odd"].as_str().unwrap().to_string()]);
                         let even =
-                            Rc::clone(&textures[&entry["even"].as_str().unwrap().to_string()]);
-                        textures.insert(name, Rc::new(Checker::new_from_textures(&odd, &even)));
+                            Arc::clone(&textures[&entry["even"].as_str().unwrap().to_string()]);
+                        textures.insert(name, Arc::new(Checker::new_from_textures(&odd, &even)));
                     }
                     "noise" => {
                         let name = entry["name"].as_str().unwrap().to_string();
                         let scale = entry["scale"].as_f64().unwrap();
-                        textures.insert(name, Rc::new(NoiseTexture::new(scale)));
+                        textures.insert(name, Arc::new(NoiseTexture::new(scale)));
                     }
                     "image" => {
                         let name = entry["name"].as_str().unwrap().to_string();
                         let path = entry["path"].as_str().unwrap().to_string();
-                        textures.insert(name, Rc::new(ImageTexture::new(path)));
+                        textures.insert(name, Arc::new(ImageTexture::new(path)));
                     }
                     _ => {}
                 }
@@ -227,7 +231,7 @@ impl Scene {
             for entry in parsed_textures["color"].members() {
                 let name = entry["name"].as_str().unwrap().to_string();
                 let color = Scene::string_to_vec(entry["color"].as_str().unwrap());
-                textures.insert(name, Rc::new(SolidColor::new(color)));
+                textures.insert(name, Arc::new(SolidColor::new(color)));
             }
         }
 
@@ -235,15 +239,15 @@ impl Scene {
         if parsed_textures.has_key("checker") {
             for entry in parsed_textures["checker"].members() {
                 let name = entry["name"].as_str().unwrap().to_string();
-                let odd = Rc::clone(&textures[&entry["odd"].as_str().unwrap().to_string()]);
-                let even = Rc::clone(&textures[&entry["even"].as_str().unwrap().to_string()]);
-                textures.insert(name, Rc::new(Checker::new_from_textures(&odd, &even)));
+                let odd = Arc::clone(&textures[&entry["odd"].as_str().unwrap().to_string()]);
+                let even = Arc::clone(&textures[&entry["even"].as_str().unwrap().to_string()]);
+                textures.insert(name, Arc::new(Checker::new_from_textures(&odd, &even)));
             }
         }
 
         // MATERIAL PARSING
         // Materials hashmap. Keys will be used later to add materials to shapes.
-        let mut materials: HashMap<String, Rc<dyn Material>> = HashMap::new();
+        let mut materials: HashMap<String, Arc<dyn Material>> = HashMap::new();
         let parsed_materials = &parsed["materials"];
 
         // Parse lambertian materials
@@ -251,7 +255,7 @@ impl Scene {
             for entry in parsed_materials["lambertian"].members() {
                 let name = entry["name"].as_str().unwrap().to_string();
                 let albedo = Scene::string_to_vec(entry["albedo"].as_str().unwrap());
-                materials.insert(name, Rc::new(Lambertian::new(albedo)));
+                materials.insert(name, Arc::new(Lambertian::new(albedo)));
             }
         }
 
@@ -262,7 +266,10 @@ impl Scene {
                 let diffuse = Scene::string_to_vec(entry["diffuse"].as_str().unwrap());
                 let specular = Scene::string_to_vec(entry["specular"].as_str().unwrap());
                 let phong_exp = entry["phongExp"].as_f64().unwrap();
-                materials.insert(name, Rc::new(BlinnPhong::new(diffuse, specular, phong_exp)));
+                materials.insert(
+                    name,
+                    Arc::new(BlinnPhong::new(diffuse, specular, phong_exp)),
+                );
             }
         }
 
@@ -271,7 +278,7 @@ impl Scene {
             for entry in parsed_materials["dielectric"].members() {
                 let name = entry["name"].as_str().unwrap().to_string();
                 let ir = entry["ir"].as_f64().unwrap();
-                materials.insert(name, Rc::new(Dielectric { ir }));
+                materials.insert(name, Arc::new(Dielectric { ir }));
             }
         }
 
@@ -284,8 +291,8 @@ impl Scene {
                 let texture = entry["texture"].as_str().unwrap();
                 materials.insert(
                     name,
-                    Rc::new(Metal {
-                        albedo: Rc::clone(&textures[texture]),
+                    Arc::new(Metal {
+                        albedo: Arc::clone(&textures[texture]),
                         fuzz,
                     }),
                 );
@@ -301,7 +308,7 @@ impl Scene {
                 let texture = entry["texture"].as_str().unwrap();
                 materials.insert(
                     name,
-                    Rc::new(Diffuse::new(Rc::clone(&textures[texture]), absorbance)),
+                    Arc::new(Diffuse::new(Arc::clone(&textures[texture]), absorbance)),
                 );
             }
         }
@@ -311,7 +318,7 @@ impl Scene {
             for entry in parsed_materials["emissive"].members() {
                 let name = entry["name"].as_str().unwrap().to_string();
                 let texture = entry["texture"].as_str().unwrap();
-                materials.insert(name, Rc::new(Emissive::new(&textures[texture])));
+                materials.insert(name, Arc::new(Emissive::new(&textures[texture])));
             }
         }
 
@@ -331,10 +338,10 @@ impl Scene {
                     point1,
                     point2,
                     point3,
-                    material: Rc::clone(&materials[&material]),
+                    material: Arc::clone(&materials[&material]),
                 };
 
-                objects.add(Rc::new(triangle));
+                objects.add(Arc::new(triangle));
             }
         }
 
@@ -347,10 +354,10 @@ impl Scene {
                 let sphere = Sphere {
                     center,
                     radius,
-                    material: Rc::clone(&materials[&material]),
+                    material: Arc::clone(&materials[&material]),
                 };
 
-                objects.add(Rc::new(sphere));
+                objects.add(Arc::new(sphere));
             }
         }
 
@@ -363,10 +370,10 @@ impl Scene {
                 let y1 = entry["y1"].as_f64().unwrap();
                 let k = entry["z"].as_f64().unwrap();
                 let material = entry["material"].as_str().unwrap().to_string();
-                let material = &Rc::clone(&materials[&material]);
+                let material = &Arc::clone(&materials[&material]);
                 let rect = XYRect::new(x0, x1, y0, y1, k, material);
 
-                objects.add(Rc::new(rect));
+                objects.add(Arc::new(rect));
             }
         }
 
@@ -378,8 +385,8 @@ impl Scene {
         // eprintln!("{}")
         Scene {
             camera,
-            lights: Box::new(lights),
-            objects: Box::new(objects),
+            lights: Arc::new(lights),
+            objects: Arc::new(objects),
             width,
             height,
             samples,
@@ -391,6 +398,37 @@ impl Scene {
 
     pub fn render(&self) {
         let mut buffer = Buffer::new(self.width as u32, self.height as u32);
+        let num_threads = num_cpus::get() - 1;
+        let div = self.height as usize / num_threads;
+        //let channels: Vec<(Sender<_>, Receiver<Vec<Color>>)> = vec![mpsc::channel(); num_threads]
+
+        for i in 0..num_threads {
+            crossbeam::scope(|scope| {
+                scope.spawn(|_| {
+                    for j in (0..self.height).rev() {
+                        eprint!("\rScanlines remaining: {} ", j);
+                        io::stderr().flush().unwrap();
+
+                        for i in 0..self.width {
+                            let mut pixel_color = Color { e: [0.0, 0.0, 0.0] };
+                            for _ in 0..self.samples {
+                                let u = (i as f64 + random_float_1()) / (self.width + 1) as f64;
+                                let v = (j as f64 + random_float_1()) / (self.height - 1) as f64;
+                                let r = self.get_ray(u, v);
+                                pixel_color += self.ray_color(&r, self.max_depth);
+                            }
+
+                            buffer.write(
+                                (1.0 / self.samples as f64) * pixel_color,
+                                i as u32,
+                                j as u32,
+                            );
+                        }
+                    }
+                });
+            });
+        }
+
         for j in (0..self.height).rev() {
             eprint!("\rScanlines remaining: {} ", j);
             io::stderr().flush().unwrap();
