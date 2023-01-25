@@ -45,7 +45,7 @@ impl Hittable for Translate {
     }
 }
 
-struct RotateY {
+pub struct RotateY {
     ptr: Arc<dyn Hittable>,
     sin_theta: f64,
     cos_theta: f64,
