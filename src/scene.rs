@@ -402,13 +402,17 @@ impl Scene {
         let div = self.height as usize / num_threads;
         //let channels: Vec<(Sender<_>, Receiver<Vec<Color>>)> = vec![mpsc::channel(); num_threads]
 
-        for i in 0..num_threads {
-            crossbeam::scope(|scope| {
-                scope.spawn(|_| {
-                    for j in (0..self.height).rev() {
-                        eprint!("\rScanlines remaining: {} ", j);
-                        io::stderr().flush().unwrap();
-
+        crossbeam::scope(|scope| {
+            let mut threads = Vec::new();
+            for i in 0..num_threads {
+                threads.push(scope.spawn(move |_| {
+                    println!("Started thread {}", i);
+                    let mut thread_buffer =
+                        vec![Vec3::new(0.0, 0.0, 0.0); div * self.width as usize];
+                    let start = div * i;
+                    // Clamp to prevent overflows from the final thread
+                    let end = (div * i + div).clamp(0, (self.width * self.height - 1) as usize);
+                    for j in (start..end).rev() {
                         for i in 0..self.width {
                             let mut pixel_color = Color { e: [0.0, 0.0, 0.0] };
                             for _ in 0..self.samples {
@@ -418,38 +422,26 @@ impl Scene {
                                 pixel_color += self.ray_color(&r, self.max_depth);
                             }
 
-                            buffer.write(
-                                (1.0 / self.samples as f64) * pixel_color,
-                                i as u32,
-                                j as u32,
-                            );
+                            thread_buffer.push(pixel_color / (self.samples as f64));
                         }
                     }
-                });
-            });
-        }
-
-        for j in (0..self.height).rev() {
-            eprint!("\rScanlines remaining: {} ", j);
-            io::stderr().flush().unwrap();
-
-            for i in 0..self.width {
-                let mut pixel_color = Color { e: [0.0, 0.0, 0.0] };
-                for _ in 0..self.samples {
-                    let u = (i as f64 + random_float_1()) / (self.width + 1) as f64;
-                    let v = (j as f64 + random_float_1()) / (self.height - 1) as f64;
-                    let r = self.get_ray(u, v);
-                    pixel_color += self.ray_color(&r, self.max_depth);
-                }
-
-                buffer.write(
-                    (1.0 / self.samples as f64) * pixel_color,
-                    i as u32,
-                    j as u32,
-                );
+                    println!("Finished thread {}", i);
+                    thread_buffer
+                }));
             }
-        }
-        println!();
+
+            let mut count = 0;
+            for thread in threads {
+                let chunk = thread.join().unwrap();
+                println!("Chunk length={}", chunk.len());
+                for pixel in chunk {
+                    buffer.write_index(pixel, count);
+                    count += 1;
+                }
+            }
+        })
+        .unwrap();
+
         buffer.buffer_to_png(String::from("image.png"));
     }
 }

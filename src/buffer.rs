@@ -63,6 +63,10 @@ impl Buffer {
         self.e[index] = value;
     }
 
+    pub fn write_index(&mut self, value: Color, index: usize) {
+        self.e[index] = value;
+    }
+
     /// Returns value at [x, y]
     pub fn at(&self, x: u32, y: u32) -> Color {
         let index = self.index(y, x);
