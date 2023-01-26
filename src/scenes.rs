@@ -296,7 +296,7 @@ impl Scene {
             Arc::new(LightList::new()),
             800,
             800,
-            10000,
+            10,
             10,
             Arc::new(BackgroundColor::new(Color::new(0.0, 0.0, 0.0))),
         )

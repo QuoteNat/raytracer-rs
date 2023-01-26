@@ -1,5 +1,6 @@
 use crate::utility::clamp;
 use crate::vector::{zero_vec, Color, Vec3};
+extern crate oidn;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
@@ -102,11 +103,28 @@ impl Buffer {
         let mut writer = encoder.write_header().unwrap();
 
         // Copy buffer as i32
-        let mut data: Vec<u8> = Vec::new();
+        let mut input: Vec<f32> = Vec::new();
         for element in &self.e {
-            data.push((256.0 * clamp(element.x(), 0.0, 0.999)) as u8);
-            data.push((256.0 * clamp(element.y(), 0.0, 0.999)) as u8);
-            data.push((256.0 * clamp(element.z(), 0.0, 0.999)) as u8);
+            input.push(element.x() as f32);
+            input.push(element.y() as f32);
+            input.push(element.z() as f32);
+        }
+
+        let device = oidn::Device::new();
+        let mut filter_output = vec![0.0f32; input.len()];
+        oidn::RayTracing::new(&device)
+            .srgb(true)
+            .image_dimensions(self.width as usize, self.height as usize)
+            .filter(&input[..], &mut filter_output[..])
+            .expect("Filter config error!");
+
+        if let Err(e) = device.get_error() {
+            println!("Error denosing image: {}", e.1);
+        }
+
+        let mut data = Vec::new();
+        for i in filter_output {
+            data.push((256.0 * f32::clamp(i, 0.0, 0.999)) as u8)
         }
 
         writer.write_image_data(&data).unwrap();
