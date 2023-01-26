@@ -489,7 +489,7 @@ impl Scene {
                     let mut thread_buffer = Vec::new();
                     // Clamp to prevent overflows from the final thread
                     for j in ((0 + i)..self.height as usize).step_by(num_threads).rev() {
-                        println!("Thread {}: lines remaining={}", i + 1, j / 3);
+                        println!("Thread {}: lines remaining={}", i + 1, j / num_threads);
                         for i in 0..self.width {
                             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                             for _ in 0..self.samples {
