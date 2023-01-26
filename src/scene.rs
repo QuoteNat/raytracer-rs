@@ -494,8 +494,12 @@ impl Scene {
                     if i == num_threads - 1 && end != self.height {
                         end = self.height;
                     }
-                    for j in (start..end).rev() {
-                        println!("Thread {}: lines remaining={}", i + 1, j - start);
+                    for j in ((0 + i)..self.height as usize).step_by(num_threads).rev() {
+                        println!(
+                            "Thread {}: lines remaining={}",
+                            i + 1,
+                            self.height - (j as i32 / 3)
+                        );
                         for i in 0..self.width {
                             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                             for _ in 0..self.samples {
