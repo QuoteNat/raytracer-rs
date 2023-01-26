@@ -1,3 +1,4 @@
+use core::num;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
@@ -517,13 +518,18 @@ impl Scene {
                 }));
             }
 
-            let mut count = 0;
+            let mut count = num_threads - 1;
             for thread in threads {
+                let mut buf_index = 0;
                 let chunk = thread.join().unwrap();
-                for pixel in chunk {
-                    buffer.write_index(pixel, count);
-                    count += 1;
+                for j in (count..self.height as usize).step_by(num_threads).rev() {
+                    for i in 0..self.width {
+                        buffer.write(chunk[buf_index], i as u32, j as u32);
+                        buf_index += 1;
+                    }
                 }
+
+                count -= 1;
             }
         })
         .unwrap();
