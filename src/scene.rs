@@ -1,4 +1,3 @@
-use core::num;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
@@ -480,7 +479,6 @@ impl Scene {
     pub fn render(&self) {
         let mut buffer = Buffer::new(self.width as u32, self.height as u32);
         let num_threads = num_cpus::get() - 1;
-        let div = self.height / num_threads as i32;
         //let channels: Vec<(Sender<_>, Receiver<Vec<Color>>)> = vec![mpsc::channel(); num_threads]
 
         crossbeam::scope(|scope| {
@@ -489,12 +487,7 @@ impl Scene {
                 threads.push(scope.spawn(move |_| {
                     println!("Started thread {}", i + 1);
                     let mut thread_buffer = Vec::new();
-                    let start = div * i as i32;
                     // Clamp to prevent overflows from the final thread
-                    let mut end = (div * i as i32 + div).clamp(0, self.width * self.height);
-                    if i == num_threads - 1 && end != self.height {
-                        end = self.height;
-                    }
                     for j in ((0 + i)..self.height as usize).step_by(num_threads).rev() {
                         println!("Thread {}: lines remaining={}", i + 1, j / 3);
                         for i in 0..self.width {
